@@ -354,5 +354,204 @@
     "triple_kill": 50,
     "quad_kill": 100,
     "rampage": 200
+  },
+  "robot_suits": {
+    "shop_enabled": true,
+    "suits_available": [
+      {
+        "name": "Scout Nano",
+        "type": "light_scout",
+        "size": "small",
+        "rarity": "common",
+        "price_evt": 50,
+        "health_bonus": 0.8,
+        "speed_multiplier": 1.4,
+        "damage_bonus": 0.9,
+        "abilities": ["double_jump", "dash"]
+      },
+      {
+        "name": "Stealth Micro",
+        "type": "stealth_assassin",
+        "size": "small",
+        "rarity": "rare",
+        "price_evt": 200,
+        "health_bonus": 0.7,
+        "speed_multiplier": 1.6,
+        "damage_bonus": 1.3,
+        "abilities": ["invisibility", "silent_movement"]
+      },
+      {
+        "name": "Combat Warrior",
+        "type": "medium_warrior",
+        "size": "medium",
+        "rarity": "uncommon",
+        "price_evt": 100,
+        "health_bonus": 1.2,
+        "armor_bonus": 25,
+        "speed_multiplier": 1.0,
+        "damage_bonus": 1.2,
+        "abilities": ["shield_boost", "melee_damage"]
+      },
+      {
+        "name": "Speed Runner X",
+        "type": "speed_runner",
+        "size": "medium",
+        "rarity": "rare",
+        "price_evt": 250,
+        "health_bonus": 1.0,
+        "speed_multiplier": 1.8,
+        "abilities": ["sprint_boost", "slide"]
+      },
+      {
+        "name": "Heavy Tank MK-II",
+        "type": "heavy_tank",
+        "size": "large",
+        "rarity": "epic",
+        "price_evt": 500,
+        "health_bonus": 2.0,
+        "armor_bonus": 100,
+        "speed_multiplier": 0.7,
+        "damage_bonus": 1.5,
+        "abilities": ["damage_resistance", "ground_pound"]
+      },
+      {
+        "name": "Assault Juggernaut",
+        "type": "juggernaut",
+        "size": "large",
+        "rarity": "epic",
+        "price_evt": 750,
+        "health_bonus": 2.5,
+        "armor_bonus": 150,
+        "speed_multiplier": 0.6,
+        "damage_bonus": 2.0,
+        "abilities": ["unstoppable", "knockback_immunity"]
+      },
+      {
+        "name": "Mega Destroyer",
+        "type": "mega_mech",
+        "size": "extra_large",
+        "rarity": "legendary",
+        "price_evt": 1500,
+        "health_bonus": 3.0,
+        "armor_bonus": 200,
+        "speed_multiplier": 0.5,
+        "damage_bonus": 2.5,
+        "abilities": ["rocket_launcher", "missile_barrage", "emp_blast"]
+      },
+      {
+        "name": "Titan Colossus",
+        "type": "mega_mech",
+        "size": "giant",
+        "rarity": "mythic",
+        "price_evt": 5000,
+        "health_bonus": 5.0,
+        "armor_bonus": 500,
+        "speed_multiplier": 0.3,
+        "damage_bonus": 4.0,
+        "abilities": ["building_crush", "earthquake", "laser_cannon", "force_field"],
+        "is_nft": true
+      },
+      {
+        "name": "Sky Drone Elite",
+        "type": "flying_drone",
+        "size": "medium",
+        "rarity": "legendary",
+        "price_evt": 2000,
+        "health_bonus": 1.0,
+        "armor_bonus": 50,
+        "speed_multiplier": 2.0,
+        "damage_bonus": 1.3,
+        "jump_bonus": 3.0,
+        "abilities": ["flight", "aerial_strike", "jetpack"]
+      },
+      {
+        "name": "Cyber Hacker",
+        "type": "tech_hacker",
+        "size": "medium",
+        "rarity": "epic",
+        "price_evt": 800,
+        "health_bonus": 1.0,
+        "speed_multiplier": 1.2,
+        "abilities": ["hack_turrets", "disable_vehicles", "scan_enemies"]
+      }
+    ]
+  },
+  "hidden_accessories": {
+    "enabled": true,
+    "max_spawned": 50,
+    "respawn_time": 300,
+    "discovery_rewards": {
+      "common": 10,
+      "uncommon": 25,
+      "rare": 50,
+      "epic": 100,
+      "legendary": 250,
+      "mythic": 1000
+    },
+    "accessory_types": [
+      "helmet",
+      "visor",
+      "shoulder",
+      "chest",
+      "arms",
+      "legs",
+      "back",
+      "weapon",
+      "shield",
+      "wings"
+    ],
+    "rarity_distribution": {
+      "common": 0.50,
+      "uncommon": 0.25,
+      "rare": 0.15,
+      "epic": 0.07,
+      "legendary": 0.025,
+      "mythic": 0.005
+    },
+    "hidden_locations": {
+      "underground_caves": 0.20,
+      "high_towers": 0.20,
+      "underwater": 0.15,
+      "hidden_buildings": 0.25,
+      "remote_zones": 0.20
+    },
+    "stat_bonuses": {
+      "common": {
+        "health": 50,
+        "armor": 10,
+        "damage": 0.05,
+        "speed": 0.03
+      },
+      "uncommon": {
+        "health": 100,
+        "armor": 25,
+        "damage": 0.10,
+        "speed": 0.06
+      },
+      "rare": {
+        "health": 200,
+        "armor": 50,
+        "damage": 0.20,
+        "speed": 0.12
+      },
+      "epic": {
+        "health": 400,
+        "armor": 100,
+        "damage": 0.35,
+        "speed": 0.20
+      },
+      "legendary": {
+        "health": 800,
+        "armor": 200,
+        "damage": 0.60,
+        "speed": 0.35
+      },
+      "mythic": {
+        "health": 2000,
+        "armor": 500,
+        "damage": 1.0,
+        "speed": 0.50
+      }
+    }
   }
 }
