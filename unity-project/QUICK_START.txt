@@ -1,0 +1,85 @@
+==============================================
+  MUNDO VIRTUAL - QUICK START GUIDE
+==============================================
+
+Unity está cargando... Espera 5-10 minutos.
+
+Mientras esperas, lee esto:
+
+==============================================
+¿QUÉ VA A PASAR CUANDO CARGUE?
+==============================================
+
+1. Ventana PROJECT aparecerá con carpetas
+2. Ventana HIERARCHY (vacía al inicio)
+3. Ventana INSPECTOR (propiedades)
+4. Ventana SCENE (vista 3D)
+5. Ventana CONSOLE (puede tener warnings amarillos)
+
+⚠️ IGNORA errores de "Photon" - no lo instalamos aún
+
+==============================================
+PRIMEROS 3 PASOS (TOMA 15 MINUTOS)
+==============================================
+
+PASO 1: Crear escena BattleArena
+  - Project → Assets/Scenes → Click derecho
+  - Create → Scene → Nombrar "BattleArena"
+  
+PASO 2: Crear terreno 5km x 5km
+  - Hierarchy → Click derecho
+  - 3D Object → Terrain
+  - Inspector → Settings → Width: 5000, Length: 5000
+
+PASO 3: Crear jugador con movimiento
+  - Hierarchy → Create Empty → Nombrar "Player"
+  - Add Component → Character Controller
+  - Add Component → PlayerMovement
+  - Agregar cámara como hijo
+
+LISTO! Presiona PLAY (▶️) para probar
+
+==============================================
+ATAJOS IMPORTANTES
+==============================================
+
+Ctrl + S = Guardar
+F = Focus en objeto
+WASD = Mover en escena
+Click derecho + Mouse = Rotar cámara
+Scroll = Zoom
+
+==============================================
+ARCHIVO COMPLETO DE PASOS
+==============================================
+
+Lee: PASOS_SIGUIENTES.md (en esta misma carpeta)
+Tiene TODO explicado paso a paso con capturas.
+
+==============================================
+¿PROBLEMAS?
+==============================================
+
+Si Unity no abre:
+  - Espera 10 minutos más
+  - Cierra y vuelve a abrir desde Unity Hub
+  
+Si ves errores rojos:
+  - Revisa PASOS_SIGUIENTES.md sección "Problemas"
+
+==============================================
+CHECKLIST RÁPIDO
+==============================================
+
+[ ] Unity terminó de cargar
+[ ] Veo carpetas en Project
+[ ] Creé escena BattleArena
+[ ] Agregué Terrain 5000x5000
+[ ] Creé Player con CharacterController
+[ ] Probé movimiento con WASD
+[ ] Instalé Photon PUN 2
+
+Cuando completes esto, estarás listo para
+añadir multijugador, bots y blockchain!
+
+🚀 ¡ÉXITO!
