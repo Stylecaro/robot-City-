@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 Ciudad Robot Metaverso - Aplicación Avanzada</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='advanced_metaverso.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="robot-logo">
+                <div class="robot-head">
+                    <div class="robot-eyes">
+                        <div class="eye left-eye"></div>
+                        <div class="eye right-eye"></div>
+                    </div>
+                    <div class="robot-mouth"></div>
+                </div>
+                <div class="robot-body">
+                    <div class="chest-panel"></div>
+                </div>
+            </div>
+            <h1 class="app-title">Ciudad Robot Metaverso</h1>
+            <div class="loading-bar">
+                <div class="loading-fill" id="loading-fill"></div>
+                <div class="loading-glow"></div>
+            </div>
+            <p class="loading-text" id="loading-text">Inicializando sistemas de IA...</p>
+            <div class="loading-stats">
+                <div class="stat">
+                    <span class="stat-label">Robots:</span>
+                    <span class="stat-value" id="loading-robots">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Sistemas:</span>
+                    <span class="stat-value" id="loading-systems">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Conexiones:</span>
+                    <span class="stat-value" id="loading-connections">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="main-app hidden">
+        <!-- Top Navigation -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <span>Ciudad Robot</span>
+                    <span class="version">v3.0</span>
+                </div>
+                <div class="breadcrumb">
+                    <span id="current-section">Dashboard</span>
+                    <span class="separator">•</span>
+                    <span class="timestamp" id="current-time"></span>
+                </div>
+            </div>
+            
+            <div class="nav-center">
+                <div class="system-status-indicator">
+                    <div class="status-dot online" id="main-status"></div>
+                    <span class="status-text">Todos los sistemas operativos</span>
+                    <div class="cpu-usage">
+                        <span>CPU: </span>
+                        <span class="usage-value" id="cpu-usage">45%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-right">
+                <div class="search-container">
+                    <input type="text" placeholder="Buscar robots, sistemas..." class="search-input" title="Buscar en el sistema">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <button class="nav-btn" id="notifications-btn" title="Notificaciones">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">5</span>
+                </button>
+                <button class="nav-btn" id="alerts-btn" title="Alertas del Sistema">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </button>
+                <button class="nav-btn" id="settings-btn" title="Configuración">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <div class="user-profile">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMwMGQ0ZmYiLz4KPHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeD0iNiIgeT0iNiI+CjxwYXRoIGQ9Ik0xMCA4QzExLjEwNDYgOCAxMiA3LjEwNDU3IDEyIDZDMTIgNC44OTU0MyAxMS4xMDQ2IDQgMTAgNEM4Ljg5NTQzIDQgOCA0Ljg5NTQzIDggNkM4IDcuMTA0NTcgOC44OTU0MyA4IDEwIDhaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTAgMTBDNy43OTA4NiAxMCA2IDEyLjQ2IDYgMTQuNVYxNkgxNFYxNC41QzE0IDEyLjQ2IDEyLjIwOTEgMTAgMTAgMTBaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4KPC9zdmc+" alt="Usuario" class="user-avatar">
+                    <span class="user-name">Admin</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3>Control Central</h3>
+                <button class="sidebar-toggle" id="sidebar-toggle" title="Contraer/Expandir">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="nav-section">
+                    <div class="section-header">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Monitoreo</span>
+                    </div>
+                    <ul class="nav-menu">
+                        <li class="nav-item active" data-section="dashboard">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Dashboard Principal</span>
+                            <div class="nav-indicator"></div>
+                        </li>
+                        <li class="nav-item" data-section="city-3d">
+                            <i class="fas fa-city"></i>
+                            <span>Ciudad 3D</span>
+                        </li>
+                        <li class="nav-item" data-section="real-time">
+                            <i class="fas fa-satellite-dish"></i>
+                            <span>Tiempo Real</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="section-header">
+                        <i class="fas fa-cogs"></i>
+                        <span>Sistemas</span>
+                    </div>
+                    <ul class="nav-menu">
+                        <li class="nav-item" data-section="manufacturing">
+                            <i class="fas fa-industry"></i>
+                            <span>Manufacturing</span>
+                            <span class="status-badge active">●</span>
+                        </li>
+                        <li class="nav-item" data-section="research">
+                            <i class="fas fa-flask"></i>
+                            <span>Investigación</span>
+                            <span class="status-badge active">●</span>
+                        </li>
+                        <li class="nav-item" data-section="security">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Seguridad</span>
+                            <span class="status-badge warning">●</span>
+                        </li>
+                        <li class="nav-item" data-section="ai-core">
+                            <i class="fas fa-brain"></i>
+                            <span>IA Central</span>
+                            <span class="status-badge active">●</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="section-header">
+                        <i class="fas fa-tools"></i>
+                        <span>Herramientas</span>
+                    </div>
+                    <ul class="nav-menu">
+                        <li class="nav-item" data-section="robots">
+                            <i class="fas fa-robot"></i>
+                            <span>Gestión Robots</span>
+                        </li>
+                        <li class="nav-item" data-section="unity">
+                            <i class="fab fa-unity"></i>
+                            <span>Unity Hub</span>
+                        </li>
+                        <li class="nav-item" data-section="analytics">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Analíticas</span>
+                        </li>
+                        <li class="nav-item" data-section="simulations">
+                            <i class="fas fa-calculator"></i>
+                            <span>Simulaciones</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <i class="fas fa-robot"></i>
+                        <span>247 Robots</span>
+                    </div>
+                    <div class="quick-stat">
+                        <i class="fas fa-bolt"></i>
+                        <span>94.2% Uptime</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="section-header">
+                    <div class="header-left">
+                        <h1>Dashboard Principal</h1>
+                        <p class="section-description">Vista general del metaverso robot en tiempo real</p>
+                    </div>
+                    <div class="header-actions">
+                        <select class="time-selector" title="Período de tiempo">
+                            <option value="1h">Última hora</option>
+                            <option value="24h" selected>Últimas 24h</option>
+                            <option value="7d">Última semana</option>
+                            <option value="30d">Último mes</option>
+                        </select>
+                        <button class="action-btn primary" id="refresh-all" title="Actualizar todo">
+                            <i class="fas fa-sync-alt"></i>
+                            Actualizar
+                        </button>
+                        <button class="action-btn secondary" id="export-data" title="Exportar datos">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Key Metrics Grid -->
+                <div class="metrics-grid">
+                    <div class="metric-card manufacturing">
+                        <div class="metric-header">
+                            <div class="metric-icon">
+                                <i class="fas fa-industry"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Manufacturing</h3>
+                                <span class="metric-subtitle">Producción Industrial</span>
+                            </div>
+                            <div class="metric-trend positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+5.2%</span>
+                            </div>
+                        </div>
+                        <div class="metric-body">
+                            <div class="metric-value" id="manufacturing-value">95.4%</div>
+                            <div class="metric-label">Eficiencia Operativa</div>
+                            <div class="metric-chart">
+                                <canvas id="manufacturing-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="metric-footer">
+                            <div class="metric-detail">
+                                <span>12 líneas activas</span>
+                                <span>•</span>
+                                <span>847 productos/h</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card research">
+                        <div class="metric-header">
+                            <div class="metric-icon">
+                                <i class="fas fa-flask"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Investigación</h3>
+                                <span class="metric-subtitle">I+D Científico</span>
+                            </div>
+                            <div class="metric-trend positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+3.1%</span>
+                            </div>
+                        </div>
+                        <div class="metric-body">
+                            <div class="metric-value" id="research-value">87.2%</div>
+                            <div class="metric-label">Progreso de Proyectos</div>
+                            <div class="metric-chart">
+                                <canvas id="research-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="metric-footer">
+                            <div class="metric-detail">
+                                <span>23 proyectos activos</span>
+                                <span>•</span>
+                                <span>156 experimentos</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card security">
+                        <div class="metric-header">
+                            <div class="metric-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>Seguridad</h3>
+                                <span class="metric-subtitle">Protección del Sistema</span>
+                            </div>
+                            <div class="metric-trend warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>1 alerta</span>
+                            </div>
+                        </div>
+                        <div class="metric-body">
+                            <div class="metric-value" id="security-value">98.7%</div>
+                            <div class="metric-label">Nivel de Seguridad</div>
+                            <div class="metric-chart">
+                                <canvas id="security-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="metric-footer">
+                            <div class="metric-detail">
+                                <span>0 amenazas críticas</span>
+                                <span>•</span>
+                                <span>1 alerta menor</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card ai-core">
+                        <div class="metric-header">
+                            <div class="metric-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="metric-info">
+                                <h3>IA Central</h3>
+                                <span class="metric-subtitle">Procesamiento Inteligente</span>
+                            </div>
+                            <div class="metric-trend positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+8.7%</span>
+                            </div>
+                        </div>
+                        <div class="metric-body">
+                            <div class="metric-value" id="ai-value">92.8%</div>
+                            <div class="metric-label">Rendimiento Neural</div>
+                            <div class="metric-chart">
+                                <canvas id="ai-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="metric-footer">
+                            <div class="metric-detail">
+                                <span>1.2M operaciones/s</span>
+                                <span>•</span>
+                                <span>15 modelos activos</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Panels -->
+                <div class="dashboard-grid">
+                    <div class="panel activity-panel">
+                        <div class="panel-header">
+                            <h3>
+                                <i class="fas fa-activity"></i>
+                                Actividad en Tiempo Real
+                            </h3>
+                            <div class="panel-actions">
+                                <button class="panel-btn" id="activity-pause" title="Pausar actualizaciones">
+                                    <i class="fas fa-pause"></i>
+                                </button>
+                                <button class="panel-btn" id="activity-filter" title="Filtros">
+                                    <i class="fas fa-filter"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="activity-stream" id="activity-stream">
+                                <!-- Activities will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel stats-panel">
+                        <div class="panel-header">
+                            <h3>
+                                <i class="fas fa-chart-pie"></i>
+                                Estadísticas del Sistema
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-icon robots">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-value" id="total-robots">247</div>
+                                        <div class="stat-label">Robots Activos</div>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon projects">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-value" id="active-projects">23</div>
+                                        <div class="stat-label">Proyectos I+D</div>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon production">
+                                        <i class="fas fa-conveyor-belt"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-value" id="production-lines">12</div>
+                                        <div class="stat-label">Líneas de Producción</div>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon simulations">
+                                        <i class="fas fa-calculator"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-value" id="running-sims">8</div>
+                                        <div class="stat-label">Simulaciones</div>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon energy">
+                                        <i class="fas fa-bolt"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-value" id="energy-efficiency">94.2%</div>
+                                        <div class="stat-label">Eficiencia Energética</div>
+                                    </div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-icon uptime">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div class="stat-content">
+                                        <div class="stat-value" id="system-uptime">99.97%</div>
+                                        <div class="stat-label">Uptime del Sistema</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- City 3D Section -->
+            <section id="city-3d-section" class="content-section">
+                <div class="section-header">
+                    <div class="header-left">
+                        <h1>Ciudad Robot 3D</h1>
+                        <p class="section-description">Vista inmersiva del metaverso en tiempo real</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="action-btn secondary" id="fullscreen-3d" title="Pantalla completa">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                        <button class="action-btn primary" id="reset-camera" title="Resetear cámara">
+                            <i class="fas fa-video"></i>
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <div class="city-3d-container">
+                    <div class="viewer-wrapper">
+                        <div id="city-3d-viewer" class="city-3d-viewer">
+                            <!-- 3D Scene will be rendered here -->
+                        </div>
+                        <div class="viewer-overlay">
+                            <div class="overlay-info">
+                                <div class="info-item">
+                                    <span class="info-label">Edificios:</span>
+                                    <span class="info-value" id="building-count-3d">25</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Robots móviles:</span>
+                                    <span class="info-value" id="mobile-robots-3d">15</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">FPS:</span>
+                                    <span class="info-value" id="fps-counter">60</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="controls-panel">
+                        <div class="control-section">
+                            <h4>Cámara</h4>
+                            <div class="control-group">
+                                <label for="camera-zoom">Zoom</label>
+                                <input type="range" id="camera-zoom" min="0.5" max="5" value="1" step="0.1" title="Control de zoom de cámara">
+                                <span class="control-value" id="zoom-value">1.0x</span>
+                            </div>
+                            <div class="control-group">
+                                <label for="camera-rotation">Rotación</label>
+                                <input type="range" id="camera-rotation" min="0" max="360" value="45" title="Control de rotación de cámara">
+                                <span class="control-value" id="rotation-value">45°</span>
+                            </div>
+                            <div class="control-group">
+                                <label for="camera-height">Altura</label>
+                                <input type="range" id="camera-height" min="5" max="50" value="25" title="Control de altura de cámara">
+                                <span class="control-value" id="height-value">25m</span>
+                            </div>
+                        </div>
+                        
+                        <div class="control-section">
+                            <h4>Visualización</h4>
+                            <div class="toggle-group">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="show-robots" checked title="Mostrar robots">
+                                    <span class="toggle-slider"></span>
+                                    Robots
+                                </label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="show-paths" title="Mostrar rutas">
+                                    <span class="toggle-slider"></span>
+                                    Rutas
+                                </label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="show-grid" checked title="Mostrar grilla">
+                                    <span class="toggle-slider"></span>
+                                    Grid
+                                </label>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="show-labels" title="Mostrar etiquetas">
+                                    <span class="toggle-slider"></span>
+                                    Etiquetas
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="control-section">
+                            <h4>Acciones</h4>
+                            <div class="button-group">
+                                <button class="control-btn" id="toggle-view-mode" title="Cambiar vista">
+                                    <i class="fas fa-eye"></i>
+                                    Vista Aérea
+                                </button>
+                                <button class="control-btn" id="take-screenshot" title="Capturar pantalla">
+                                    <i class="fas fa-camera"></i>
+                                    Captura
+                                </button>
+                                <button class="control-btn" id="start-tour" title="Tour automático">
+                                    <i class="fas fa-route"></i>
+                                    Tour
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel" class="notification-panel hidden">
+        <div class="panel-header">
+            <h3>
+                <i class="fas fa-bell"></i>
+                Notificaciones
+            </h3>
+            <div class="panel-actions">
+                <button class="panel-btn" id="mark-all-read" title="Marcar todo como leído">
+                    <i class="fas fa-check-double"></i>
+                </button>
+                <button class="panel-btn" id="close-notifications" title="Cerrar panel">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="notification-list" id="notification-list">
+                <!-- Notifications will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='advanced_metaverso.js') }}"></script>
+</body>
+</html>

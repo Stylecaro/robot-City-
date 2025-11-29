@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciudad Robot Metaverso - Aplicación Avanzada</title>
+    <link rel="stylesheet" href="metaverso_app_styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <!-- Splash Screen / Loading -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <div class="logo-container">
+                <i class="fas fa-robot logo-icon"></i>
+                <h1>Ciudad Robot Metaverso</h1>
+            </div>
+            <div class="loading-bar">
+                <div class="loading-progress" id="loading-progress"></div>
+            </div>
+            <p class="loading-text" id="loading-text">Inicializando sistemas...</p>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="main-app hidden">
+        <!-- Navigation Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <i class="fas fa-robot"></i>
+                <span class="app-title">Ciudad Robot Metaverso</span>
+                <span class="version">v2.0</span>
+            </div>
+            <div class="header-center">
+                <div class="system-status">
+                    <span class="status-indicator online" id="system-status"></span>
+                    <span class="status-text">Sistema Operativo</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="header-btn" id="notifications-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count">3</span>
+                </button>
+                <button class="header-btn" id="settings-btn" title="Configuración">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button class="header-btn" id="user-btn" title="Usuario">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-section">
+                <h3>Control Principal</h3>
+                <ul class="nav-list">
+                    <li class="nav-item active" data-section="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="nav-item" data-section="city-view">
+                        <i class="fas fa-city"></i>
+                        <span>Vista Ciudad 3D</span>
+                    </li>
+                    <li class="nav-item" data-section="unity-hub">
+                        <i class="fab fa-unity"></i>
+                        <span>Unity Hub</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Sistemas</h3>
+                <ul class="nav-list">
+                    <li class="nav-item" data-section="manufacturing">
+                        <i class="fas fa-industry"></i>
+                        <span>Manufacturing</span>
+                    </li>
+                    <li class="nav-item" data-section="research">
+                        <i class="fas fa-flask"></i>
+                        <span>Investigación</span>
+                    </li>
+                    <li class="nav-item" data-section="security">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Seguridad</span>
+                    </li>
+                    <li class="nav-item" data-section="ai-engine">
+                        <i class="fas fa-brain"></i>
+                        <span>IA Central</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Herramientas</h3>
+                <ul class="nav-list">
+                    <li class="nav-item" data-section="simulations">
+                        <i class="fas fa-calculator"></i>
+                        <span>Simulaciones</span>
+                    </li>
+                    <li class="nav-item" data-section="analytics">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Analíticas</span>
+                    </li>
+                    <li class="nav-item" data-section="config">
+                        <i class="fas fa-wrench"></i>
+                        <span>Configuración</span>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <div class="section-header">
+                    <h2>Dashboard Principal</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" id="refresh-btn">
+                            <i class="fas fa-sync-alt"></i>
+                            Actualizar
+                        </button>
+                        <button class="btn btn-secondary" id="export-btn">
+                            <i class="fas fa-download"></i>
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Key Metrics Cards -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon manufacturing">
+                            <i class="fas fa-industry"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Manufacturing</h3>
+                            <div class="metric-value" id="manufacturing-value">95%</div>
+                            <div class="metric-change positive">+5% vs ayer</div>
+                        </div>
+                        <div class="metric-chart">
+                            <canvas id="manufacturing-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon research">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Investigación</h3>
+                            <div class="metric-value" id="research-value">87%</div>
+                            <div class="metric-change positive">+3% vs ayer</div>
+                        </div>
+                        <div class="metric-chart">
+                            <canvas id="research-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon security">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>Seguridad</h3>
+                            <div class="metric-value" id="security-value">99%</div>
+                            <div class="metric-change neutral">Sin cambios</div>
+                        </div>
+                        <div class="metric-chart">
+                            <canvas id="security-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon ai">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3>IA Central</h3>
+                            <div class="metric-value" id="ai-value">92%</div>
+                            <div class="metric-change positive">+8% vs ayer</div>
+                        </div>
+                        <div class="metric-chart">
+                            <canvas id="ai-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Activity Feed -->
+                <div class="dashboard-row">
+                    <div class="panel activity-panel">
+                        <div class="panel-header">
+                            <h3>Actividad en Tiempo Real</h3>
+                            <div class="panel-actions">
+                                <button class="btn-icon" id="activity-filter" title="Filtrar actividad">
+                                    <i class="fas fa-filter"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="activity-feed" id="activity-feed">
+                            <!-- Activities will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="panel system-overview">
+                        <div class="panel-header">
+                            <h3>Resumen del Sistema</h3>
+                        </div>
+                        <div class="system-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Robots Activos</span>
+                                <span class="stat-value" id="active-robots">247</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Proyectos de Investigación</span>
+                                <span class="stat-value" id="research-projects">23</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Líneas de Producción</span>
+                                <span class="stat-value" id="production-lines">12</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Simulaciones Ejecutándose</span>
+                                <span class="stat-value" id="running-simulations">8</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Amenazas Detectadas</span>
+                                <span class="stat-value" id="threats-detected">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Eficiencia Energética</span>
+                                <span class="stat-value" id="energy-efficiency">94.2%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- City View Section -->
+            <section id="city-view-section" class="content-section">
+                <div class="section-header">
+                    <h2>Vista Ciudad 3D</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" id="toggle-view">
+                            <i class="fas fa-eye"></i>
+                            Vista Aérea
+                        </button>
+                    </div>
+                </div>
+                <div class="city-viewer-container">
+                    <div id="city-viewer" class="city-viewer">
+                        <!-- 3D City View will be rendered here -->
+                    </div>
+                    <div class="city-controls">
+                        <div class="control-group">
+                            <label>Zoom</label>
+                            <input type="range" id="zoom-slider" min="1" max="10" value="5" title="Control de zoom">
+                        </div>
+                        <div class="control-group">
+                            <label>Rotación</label>
+                            <input type="range" id="rotation-slider" min="0" max="360" value="0" title="Control de rotación">
+                        </div>
+                        <div class="control-group">
+                            <button class="btn btn-small" id="reset-view">Resetear Vista</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Unity Hub Section -->
+            <section id="unity-hub-section" class="content-section">
+                <div class="section-header">
+                    <h2>Unity Hub Integration</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-primary" id="launch-unity">
+                            <i class="fab fa-unity"></i>
+                            Abrir Unity Hub
+                        </button>
+                    </div>
+                </div>
+                <div class="unity-integration">
+                    <div class="unity-status-card">
+                        <div class="status-header">
+                            <i class="fab fa-unity unity-icon"></i>
+                            <div>
+                                <h3>Unity Hub Status</h3>
+                                <p class="status-text" id="unity-status-text">Conectado</p>
+                            </div>
+                        </div>
+                        <div class="unity-info">
+                            <div class="info-item">
+                                <span class="info-label">Versión</span>
+                                <span class="info-value" id="unity-version">3.14.2</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Proyectos</span>
+                                <span class="info-value" id="unity-projects">1</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Estado</span>
+                                <span class="info-value online" id="unity-connection">Online</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-manager">
+                        <h3>Gestor de Proyectos</h3>
+                        <div class="project-list">
+                            <div class="project-item">
+                                <div class="project-icon">
+                                    <i class="fas fa-city"></i>
+                                </div>
+                                <div class="project-info">
+                                    <h4>CiudadRobotMetaverso</h4>
+                                    <p>Proyecto principal del metaverso</p>
+                                    <small>Última modificación: Hace 2 horas</small>
+                                </div>
+                                <div class="project-actions">
+                                    <button class="btn btn-small btn-primary">
+                                        <i class="fas fa-play"></i>
+                                        Abrir
+                                    </button>
+                                    <button class="btn btn-small btn-secondary">
+                                        <i class="fas fa-cog"></i>
+                                        Configurar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="quick-actions">
+                            <button class="btn btn-outline" id="create-project">
+                                <i class="fas fa-plus"></i>
+                                Nuevo Proyecto
+                            </button>
+                            <button class="btn btn-outline" id="import-project">
+                                <i class="fas fa-download"></i>
+                                Importar Proyecto
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel" class="notification-panel hidden">
+        <div class="panel-header">
+            <h3>Notificaciones</h3>
+            <button class="btn-close" id="close-notifications" title="Cerrar notificaciones">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list" id="notification-list">
+            <!-- Notifications will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="metaverso_app.js"></script>
+</body>
+</html>

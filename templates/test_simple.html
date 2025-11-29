@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciudad Robot - Test Simple</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0,0,0,0.3);
+            padding: 30px;
+            border-radius: 15px;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        .button {
+            background: #00ff88;
+            color: black;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Ciudad Robot - Test Simple</h1>
+        
+        <div class="status">
+            <h2>✅ Servidor Flask Funcionando</h2>
+            <p>Todas las dependencias están cargadas correctamente</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Aplicaciones Disponibles</h3>
+            <a href="/advanced" class="button">🚀 Aplicación Avanzada</a>
+            <a href="/ciudad3d" class="button">🎮 Visor 3D</a>
+            <a href="/test" class="button">🔧 Test de Conexión</a>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 Estado del Sistema</h3>
+            <div id="status-info">
+                <p>🔗 WebSocket: <span id="ws-status">Conectando...</span></p>
+                <p>⏰ Última actualización: <span id="last-update">-</span></p>
+                <p>🤖 Robots activos: <span id="robot-count">0</span></p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔧 Diagnóstico</h3>
+            <p>Si esta página se carga correctamente, el servidor Flask está funcionando.</p>
+            <p>Prueba las aplicaciones usando los botones de arriba.</p>
+        </div>
+    </div>
+
+    <script>
+        // Test de conexión básico
+        document.addEventListener('DOMContentLoaded', function() {
+            const wsStatus = document.getElementById('ws-status');
+            const lastUpdate = document.getElementById('last-update');
+            const robotCount = document.getElementById('robot-count');
+
+            // Actualizar timestamp
+            function updateTime() {
+                lastUpdate.textContent = new Date().toLocaleTimeString();
+            }
+
+            // Simular datos
+            function updateData() {
+                robotCount.textContent = Math.floor(Math.random() * 50) + 20;
+                updateTime();
+            }
+
+            // Test de WebSocket
+            try {
+                if (typeof io !== 'undefined') {
+                    const socket = io();
+                    socket.on('connect', function() {
+                        wsStatus.textContent = 'Conectado ✅';
+                        wsStatus.style.color = '#00ff88';
+                    });
+                    socket.on('disconnect', function() {
+                        wsStatus.textContent = 'Desconectado ❌';
+                        wsStatus.style.color = '#ff6b6b';
+                    });
+                } else {
+                    wsStatus.textContent = 'WebSocket no disponible';
+                    wsStatus.style.color = '#ffa500';
+                }
+            } catch (error) {
+                wsStatus.textContent = 'Error de conexión';
+                wsStatus.style.color = '#ff6b6b';
+            }
+
+            // Actualizar datos cada 2 segundos
+            setInterval(updateData, 2000);
+            updateData();
+        });
+    </script>
+</body>
+</html>

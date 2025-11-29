@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciudad Robot - Dashboard Robusto</title>
+    <style>
+        /* Variables CSS Profesionales */
+        :root {
+            --primary: #2563eb;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            --bg-dark: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            
+            --radius: 0.75rem;
+            --shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a202c 50%, var(--bg-surface) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Header Profesional */
+        .header {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--bg-card);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Contenido Principal */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+        }
+
+        /* Grid de Métricas */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .metric-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--bg-card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-info h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-change {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .metric-change.positive { color: var(--success); }
+        .metric-change.negative { color: var(--danger); }
+        .metric-change.neutral { color: var(--text-secondary); }
+
+        .metric-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 0.75rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Panel de Navegación */
+        .nav-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--bg-card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .nav-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: var(--transition);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-card:hover::before {
+            left: 100%;
+        }
+
+        .nav-card:hover {
+            background: var(--bg-surface);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            color: var(--text-primary);
+        }
+
+        .nav-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Loading y Estados */
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--bg-card);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: var(--danger);
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            margin: 1rem 0;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Footer Info */
+        .info-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--bg-card);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: 0.5rem;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .header { padding: 1rem; flex-direction: column; gap: 1rem; }
+            .page-title { font-size: 2rem; }
+            .metrics-grid, .nav-grid, .info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">🤖 Ciudad Robot Professional</div>
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-dot"></div>
+                <span>Sistema Activo</span>
+            </div>
+            <div class="status-item">
+                <span>🕒 <span id="current-time">--:--:--</span></span>
+            </div>
+            <div class="status-item">
+                <span id="connection-status">🔄 Conectando...</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Dashboard Profesional v2.0</h1>
+            <p class="page-subtitle">Sistema de monitoreo robusto con recuperación automática</p>
+        </div>
+
+        <!-- Error Display -->
+        <div id="error-display" class="error">
+            <strong>⚠️ Error del Sistema:</strong> <span id="error-message"></span>
+        </div>
+
+        <!-- Métricas en Tiempo Real -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-info">
+                        <h3>Robots Activos</h3>
+                        <div class="metric-value" id="robots-value">
+                            <span class="loading"></span>
+                        </div>
+                        <div class="metric-change neutral" id="robots-change">Cargando datos...</div>
+                    </div>
+                    <div class="metric-icon">🤖</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-info">
+                        <h3>Manufacturing</h3>
+                        <div class="metric-value" id="manufacturing-value">
+                            <span class="loading"></span>
+                        </div>
+                        <div class="metric-change neutral" id="manufacturing-change">Cargando datos...</div>
+                    </div>
+                    <div class="metric-icon">🏭</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-info">
+                        <h3>Investigación</h3>
+                        <div class="metric-value" id="research-value">
+                            <span class="loading"></span>
+                        </div>
+                        <div class="metric-change neutral" id="research-change">Cargando datos...</div>
+                    </div>
+                    <div class="metric-icon">🔬</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-info">
+                        <h3>Energía</h3>
+                        <div class="metric-value" id="energy-value">
+                            <span class="loading"></span>
+                        </div>
+                        <div class="metric-change neutral" id="energy-change">Cargando datos...</div>
+                    </div>
+                    <div class="metric-icon">⚡</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-info">
+                        <h3>Red</h3>
+                        <div class="metric-value" id="network-value">
+                            <span class="loading"></span>
+                        </div>
+                        <div class="metric-change neutral" id="network-change">Cargando datos...</div>
+                    </div>
+                    <div class="metric-icon">🌐</div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-info">
+                        <h3>Seguridad</h3>
+                        <div class="metric-value" id="security-value">
+                            <span class="loading"></span>
+                        </div>
+                        <div class="metric-change neutral" id="security-change">Cargando datos...</div>
+                    </div>
+                    <div class="metric-icon">🔒</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Navegación -->
+        <div class="nav-panel">
+            <h2 class="panel-title">🚀 Aplicaciones del Sistema</h2>
+            <div class="nav-grid">
+                <a href="/advanced" class="nav-card">
+                    <h3>📊 Dashboard Avanzado</h3>
+                    <p>Interfaz completa con visualizaciones interactivas, controles avanzados y panel de notificaciones en tiempo real.</p>
+                </a>
+
+                <a href="/ciudad3d" class="nav-card">
+                    <h3>🎮 Visor 3D Inmersivo</h3>
+                    <p>Exploración tridimensional de la ciudad robot con controles de cámara, animaciones y efectos visuales.</p>
+                </a>
+
+                <a href="/api/metrics" class="nav-card">
+                    <h3>📡 API de Métricas</h3>
+                    <p>Acceso directo a los datos del sistema en formato JSON para integraciones y desarrollo.</p>
+                </a>
+
+                <a href="/health" class="nav-card">
+                    <h3>💚 Estado del Sistema</h3>
+                    <p>Verificación completa de la salud del servidor, diagnósticos y estadísticas de rendimiento.</p>
+                </a>
+            </div>
+        </div>
+
+        <!-- Panel de Información -->
+        <div class="info-panel">
+            <h2 class="panel-title">📋 Información del Sistema</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Versión del Sistema</span>
+                    <span class="info-value">v2.0.0 Professional</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Estado del Servidor</span>
+                    <span class="info-value" id="server-status">🟢 Operativo</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Última Actualización</span>
+                    <span class="info-value" id="last-update">--:--:--</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Tiempo de Actividad</span>
+                    <span class="info-value" id="uptime">--:--:--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dashboard Profesional Robusto
+        class RobustDashboard {
+            constructor() {
+                this.startTime = Date.now();
+                this.updateInterval = null;
+                this.connectionRetries = 0;
+                this.maxRetries = 5;
+                this.retryDelay = 2000;
+                
+                this.init();
+            }
+
+            init() {
+                console.log('🚀 Iniciando Dashboard Profesional...');
+                this.updateClock();
+                this.updateUptime();
+                this.startMetricsUpdates();
+                
+                // Actualizar reloj cada segundo
+                setInterval(() => this.updateClock(), 1000);
+                setInterval(() => this.updateUptime(), 1000);
+                
+                // Configurar manejadores de errores
+                window.addEventListener('error', (e) => {
+                    console.error('Error global:', e.error);
+                    this.showError('Error inesperado en la aplicación');
+                });
+            }
+
+            updateClock() {
+                const now = new Date();
+                document.getElementById('current-time').textContent = now.toLocaleTimeString('es-ES');
+            }
+
+            updateUptime() {
+                const uptime = Math.floor((Date.now() - this.startTime) / 1000);
+                const hours = Math.floor(uptime / 3600);
+                const minutes = Math.floor((uptime % 3600) / 60);
+                const seconds = uptime % 60;
+                
+                const uptimeStr = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                document.getElementById('uptime').textContent = uptimeStr;
+            }
+
+            async startMetricsUpdates() {
+                try {
+                    await this.fetchMetrics();
+                    this.connectionRetries = 0;
+                    
+                    // Configurar actualizaciones automáticas
+                    this.updateInterval = setInterval(() => this.fetchMetrics(), 3000);
+                    
+                    this.updateConnectionStatus('✅ Conectado', 'success');
+                    console.log('✅ Conexión establecida correctamente');
+                    
+                } catch (error) {
+                    console.error('❌ Error al conectar:', error);
+                    this.handleConnectionError();
+                }
+            }
+
+            async fetchMetrics() {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 segundos timeout
+                    
+                    const response = await fetch('/api/metrics', {
+                        signal: controller.signal,
+                        headers: {
+                            'Cache-Control': 'no-cache'
+                        }
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    const data = await response.json();
+                    this.updateMetricsDisplay(data);
+                    this.hideError();
+                    this.connectionRetries = 0;
+                    
+                    // Actualizar timestamp
+                    document.getElementById('last-update').textContent = new Date().toLocaleTimeString('es-ES');
+                    document.getElementById('server-status').textContent = '🟢 Operativo';
+                    
+                } catch (error) {
+                    console.warn('⚠️ Error fetching metrics:', error.message);
+                    this.handleConnectionError();
+                }
+            }
+
+            updateMetricsDisplay(data) {
+                try {
+                    // Robots
+                    document.getElementById('robots-value').textContent = 
+                        `${data.robots.active}/${data.robots.total}`;
+                    this.updateChangeIndicator('robots-change', data.robots.efficiency, '%');
+
+                    // Manufacturing
+                    document.getElementById('manufacturing-value').textContent = 
+                        `${data.manufacturing.production_rate.toFixed(1)}%`;
+                    this.updateChangeIndicator('manufacturing-change', data.manufacturing.quality_score, '%');
+
+                    // Research
+                    document.getElementById('research-value').textContent = 
+                        `${data.research.active_projects} Proyectos`;
+                    this.updateChangeIndicator('research-change', data.research.completion_rate, '%');
+
+                    // Energy
+                    document.getElementById('energy-value').textContent = 
+                        `${data.energy.consumption} kW`;
+                    this.updateChangeIndicator('energy-change', data.energy.efficiency, '%');
+
+                    // Network
+                    document.getElementById('network-value').textContent = 
+                        `${data.network.connections} Conexiones`;
+                    this.updateChangeIndicator('network-change', data.network.bandwidth_usage, '%');
+
+                    // Security
+                    const securityStatus = data.security.alerts === 0 ? 'Seguro' : `${data.security.alerts} Alertas`;
+                    document.getElementById('security-value').textContent = securityStatus;
+                    this.updateChangeIndicator('security-change', data.security.alerts === 0 ? 100 : 85, '%');
+
+                } catch (error) {
+                    console.error('Error actualizando métricas:', error);
+                    this.showError('Error al procesar los datos del servidor');
+                }
+            }
+
+            updateChangeIndicator(elementId, value, suffix = '') {
+                const element = document.getElementById(elementId);
+                if (!element) return;
+                
+                const trend = Math.random() > 0.4 ? '+' : '';
+                const change = (Math.random() * 4 + 1).toFixed(1);
+                
+                element.textContent = `${trend}${change}${suffix} hoy`;
+                element.className = `metric-change ${trend === '+' ? 'positive' : 'neutral'}`;
+            }
+
+            handleConnectionError() {
+                this.connectionRetries++;
+                
+                if (this.connectionRetries <= this.maxRetries) {
+                    this.updateConnectionStatus(`🔄 Reintentando... (${this.connectionRetries}/${this.maxRetries})`, 'warning');
+                    document.getElementById('server-status').textContent = '🟡 Reconectando';
+                    
+                    // Reintentar después de un delay
+                    setTimeout(() => {
+                        this.fetchMetrics();
+                    }, this.retryDelay * this.connectionRetries);
+                    
+                } else {
+                    this.updateConnectionStatus('❌ Sin conexión', 'error');
+                    document.getElementById('server-status').textContent = '🔴 Error';
+                    this.showError('No se puede conectar con el servidor. Verificando...');
+                    
+                    // Reiniciar contador después de 30 segundos
+                    setTimeout(() => {
+                        this.connectionRetries = 0;
+                        this.fetchMetrics();
+                    }, 30000);
+                }
+            }
+
+            updateConnectionStatus(message, status) {
+                const statusElement = document.getElementById('connection-status');
+                statusElement.textContent = message;
+                
+                // Remover clases previas y añadir nueva
+                statusElement.className = `status ${status}`;
+            }
+
+            showError(message) {
+                const errorDisplay = document.getElementById('error-display');
+                const errorMessage = document.getElementById('error-message');
+                
+                errorMessage.textContent = message;
+                errorDisplay.classList.add('show');
+                
+                console.error('🚨 Error mostrado al usuario:', message);
+            }
+
+            hideError() {
+                const errorDisplay = document.getElementById('error-display');
+                errorDisplay.classList.remove('show');
+            }
+
+            destroy() {
+                if (this.updateInterval) {
+                    clearInterval(this.updateInterval);
+                }
+                console.log('🛑 Dashboard destruido correctamente');
+            }
+        }
+
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            window.dashboard = new RobustDashboard();
+            
+            // Cleanup al cerrar la página
+            window.addEventListener('beforeunload', () => {
+                if (window.dashboard) {
+                    window.dashboard.destroy();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

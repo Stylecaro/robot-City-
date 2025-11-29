@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/robot-icon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Ciudad Robot Virtual - Entorno 3D inmersivo con IA avanzada" />
+    <title>Ciudad Robot Virtual</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        overflow: hidden;
+      }
+      
+      #root {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+      }
+      
+      /* Loading screen */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+      }
+      
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        border-top: 5px solid #fff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .loading-text {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+      }
+      
+      .loading-progress {
+        width: 300px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      
+      .loading-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #4CAF50, #8BC34A);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div class="loading-screen" id="loading-screen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Cargando Ciudad Robot...</div>
+        <div class="loading-progress">
+          <div class="loading-bar" id="loading-bar" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // Simular progreso de carga
+      let progress = 0;
+      const loadingBar = document.getElementById('loading-bar');
+      
+      const updateProgress = () => {
+        progress += Math.random() * 15;
+        if (progress > 100) progress = 100;
+        
+        loadingBar.style.width = progress + '%';
+        
+        if (progress < 100) {
+          setTimeout(updateProgress, 200);
+        }
+      };
+      
+      updateProgress();
+      
+      // Ocultar pantalla de carga cuando React se monte
+      window.hideLoadingScreen = () => {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+          loadingScreen.style.opacity = '0';
+          loadingScreen.style.transition = 'opacity 0.5s ease';
+          setTimeout(() => {
+            loadingScreen.style.display = 'none';
+          }, 500);
+        }
+      };
+    </script>
+    
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

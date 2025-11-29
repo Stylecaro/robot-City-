@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏙️ Ciudad Robot Metaverso - Vista 3D</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+        
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.8);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .robot-icon {
+            font-size: 2rem;
+            color: #00d4ff;
+            animation: pulse 2s infinite;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .control-group label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .control-slider {
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        
+        .control-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #00d4ff;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+        }
+        
+        .viewer-container {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(0, 212, 255, 0.05) 0%, transparent 70%);
+        }
+        
+        .info-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            max-width: 300px;
+        }
+        
+        .info-title {
+            color: #00d4ff;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .stats-panel {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            min-width: 200px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .stat-value {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+        
+        .city-viewer-full {
+            width: 100%;
+            height: 100%;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 212, 255, 0.3);
+            border-top: 3px solid #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <div class="robot-icon">🤖</div>
+            <span>Ciudad Robot Metaverso</span>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label>Zoom</label>
+                <input type="range" class="control-slider" id="zoom-slider" min="1" max="10" value="5" title="Control de Zoom">
+            </div>
+            <div class="control-group">
+                <label>Rotación</label>
+                <input type="range" class="control-slider" id="rotation-slider" min="0" max="360" value="45" title="Control de Rotación">
+            </div>
+            <button class="btn" id="view-toggle">Vista Aérea</button>
+            <button class="btn" id="reset-btn">Reset</button>
+        </div>
+    </div>
+
+    <!-- 3D Viewer -->
+    <div class="viewer-container">
+        <div id="city-viewer" class="city-viewer-full"></div>
+        
+        <!-- Loading Screen -->
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Cargando Ciudad Robot...</p>
+        </div>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="info-panel floating">
+        <div class="info-title">🏙️ Ciudad Robot Activa</div>
+        <div class="info-text">
+            Una metrópolis futurista poblada por robots inteligentes. 
+            Cada edificio representa diferentes sistemas: manufactura, 
+            investigación, seguridad y centro de IA.
+        </div>
+    </div>
+
+    <!-- Stats Panel -->
+    <div class="stats-panel">
+        <div class="stat-item">
+            <span class="stat-label">Edificios:</span>
+            <span class="stat-value" id="building-count">25</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Robots Activos:</span>
+            <span class="stat-value" id="robot-count">247</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Zonas:</span>
+            <span class="stat-value">5</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">Eficiencia:</span>
+            <span class="stat-value">94.2%</span>
+        </div>
+    </div>
+
+    <script>
+        class CityViewer3D {
+            constructor() {
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+                this.buildings = [];
+                this.robots = [];
+                this.currentView = 'aerial';
+                this.init();
+            }
+
+            init() {
+                this.setupScene();
+                this.createCity();
+                this.createRobots();
+                this.setupLighting();
+                this.setupControls();
+                this.animate();
+                
+                // Hide loading screen
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                }, 2000);
+            }
+
+            setupScene() {
+                const container = document.getElementById('city-viewer');
+                
+                // Scene
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x0f0f23);
+                this.scene.fog = new THREE.Fog(0x1a1a2e, 50, 200);
+
+                // Camera
+                this.camera = new THREE.PerspectiveCamera(
+                    75, 
+                    container.offsetWidth / container.offsetHeight, 
+                    0.1, 
+                    1000
+                );
+                this.camera.position.set(30, 25, 30);
+                this.camera.lookAt(0, 0, 0);
+
+                // Renderer
+                this.renderer = new THREE.WebGLRenderer({ 
+                    antialias: true,
+                    alpha: true 
+                });
+                this.renderer.setSize(container.offsetWidth, container.offsetHeight);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                this.renderer.setClearColor(0x0f0f23, 1);
+                
+                container.appendChild(this.renderer.domElement);
+
+                // Handle resize
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = container.offsetWidth / container.offsetHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(container.offsetWidth, container.offsetHeight);
+                });
+            }
+
+            createCity() {
+                // Ground plane
+                const groundGeometry = new THREE.PlaneGeometry(100, 100);
+                const groundMaterial = new THREE.MeshLambertMaterial({ 
+                    color: 0x1a1a2e,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+                ground.rotation.x = -Math.PI / 2;
+                ground.receiveShadow = true;
+                this.scene.add(ground);
+
+                // Grid lines
+                const gridHelper = new THREE.GridHelper(100, 20, 0x00d4ff, 0x004466);
+                gridHelper.material.transparent = true;
+                gridHelper.material.opacity = 0.3;
+                this.scene.add(gridHelper);
+
+                // Building types and colors
+                const buildingTypes = [
+                    { color: 0x00d4ff, name: 'Manufacturing', height: [8, 15] },
+                    { color: 0x4ecdc4, name: 'Research', height: [10, 20] },
+                    { color: 0xff6b35, name: 'Energy', height: [6, 12] },
+                    { color: 0xa55eea, name: 'AI Center', height: [15, 25] },
+                    { color: 0xff4757, name: 'Security', height: [5, 10] }
+                ];
+
+                // Create buildings in zones
+                for (let zone = 0; zone < 5; zone++) {
+                    const zoneX = (zone % 3 - 1) * 25;
+                    const zoneZ = Math.floor(zone / 3) * 25 - 12.5;
+                    const buildingType = buildingTypes[zone];
+
+                    for (let i = 0; i < 5; i++) {
+                        const building = this.createBuilding(
+                            zoneX + (Math.random() - 0.5) * 20,
+                            zoneZ + (Math.random() - 0.5) * 20,
+                            buildingType
+                        );
+                        this.buildings.push(building);
+                        this.scene.add(building);
+                    }
+                }
+
+                // Central tower (AI Core)
+                const centralTower = this.createCentralTower();
+                this.scene.add(centralTower);
+            }
+
+            createBuilding(x, z, type) {
+                const height = Math.random() * (type.height[1] - type.height[0]) + type.height[0];
+                const width = Math.random() * 3 + 2;
+                const depth = Math.random() * 3 + 2;
+
+                const geometry = new THREE.BoxGeometry(width, height, depth);
+                const material = new THREE.MeshLambertMaterial({ 
+                    color: type.color,
+                    transparent: true,
+                    opacity: 0.9
+                });
+
+                const building = new THREE.Mesh(geometry, material);
+                building.position.set(x, height / 2, z);
+                building.castShadow = true;
+                building.receiveShadow = true;
+
+                // Add glow effect
+                const glowGeometry = new THREE.BoxGeometry(width * 1.1, height * 1.1, depth * 1.1);
+                const glowMaterial = new THREE.MeshBasicMaterial({
+                    color: type.color,
+                    transparent: true,
+                    opacity: 0.1
+                });
+                const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+                building.add(glow);
+
+                // Add windows
+                this.addWindows(building, width, height, depth, type.color);
+
+                building.userData = { type: type.name, originalY: height / 2 };
+                return building;
+            }
+
+            addWindows(building, width, height, depth, color) {
+                const windowGeometry = new THREE.PlaneGeometry(0.3, 0.3);
+                const windowMaterial = new THREE.MeshBasicMaterial({
+                    color: color,
+                    transparent: true,
+                    opacity: 0.8,
+                    emissive: color,
+                    emissiveIntensity: 0.3
+                });
+
+                // Front and back windows
+                for (let y = 1; y < height - 1; y += 2) {
+                    for (let x = -width/2 + 1; x < width/2; x += 1.5) {
+                        if (Math.random() > 0.3) { // Random window placement
+                            const window1 = new THREE.Mesh(windowGeometry, windowMaterial);
+                            window1.position.set(x, y - height/2, depth/2 + 0.01);
+                            building.add(window1);
+
+                            const window2 = new THREE.Mesh(windowGeometry, windowMaterial);
+                            window2.position.set(x, y - height/2, -depth/2 - 0.01);
+                            window2.rotation.y = Math.PI;
+                            building.add(window2);
+                        }
+                    }
+                }
+            }
+
+            createCentralTower() {
+                const geometry = new THREE.CylinderGeometry(3, 5, 30, 8);
+                const material = new THREE.MeshLambertMaterial({
+                    color: 0x00d4ff,
+                    transparent: true,
+                    opacity: 0.9,
+                    emissive: 0x002244,
+                    emissiveIntensity: 0.3
+                });
+
+                const tower = new THREE.Mesh(geometry, material);
+                tower.position.set(0, 15, 0);
+                tower.castShadow = true;
+
+                // Add rotating ring
+                const ringGeometry = new THREE.TorusGeometry(4, 0.5, 8, 16);
+                const ringMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x00d4ff,
+                    emissive: 0x00d4ff,
+                    emissiveIntensity: 0.5
+                });
+                const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                ring.position.y = 10;
+                tower.add(ring);
+
+                tower.userData = { 
+                    isCore: true,
+                    ring: ring
+                };
+
+                return tower;
+            }
+
+            createRobots() {
+                for (let i = 0; i < 15; i++) {
+                    const robot = this.createRobot();
+                    this.robots.push(robot);
+                    this.scene.add(robot);
+                }
+            }
+
+            createRobot() {
+                const group = new THREE.Group();
+
+                // Body
+                const bodyGeometry = new THREE.CapsuleGeometry(0.3, 1, 4, 8);
+                const bodyMaterial = new THREE.MeshLambertMaterial({
+                    color: 0xffffff,
+                    metalness: 0.8,
+                    roughness: 0.2
+                });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                group.add(body);
+
+                // Head
+                const headGeometry = new THREE.SphereGeometry(0.25, 8, 8);
+                const headMaterial = new THREE.MeshLambertMaterial({
+                    color: 0x00d4ff,
+                    emissive: 0x001122,
+                    emissiveIntensity: 0.3
+                });
+                const head = new THREE.Mesh(headGeometry, headMaterial);
+                head.position.y = 0.8;
+                group.add(head);
+
+                // Position randomly
+                group.position.set(
+                    (Math.random() - 0.5) * 80,
+                    1,
+                    (Math.random() - 0.5) * 80
+                );
+
+                // Random movement
+                group.userData = {
+                    moveSpeed: Math.random() * 0.02 + 0.01,
+                    direction: Math.random() * Math.PI * 2,
+                    originalPosition: group.position.clone()
+                };
+
+                return group;
+            }
+
+            setupLighting() {
+                // Ambient light
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+                this.scene.add(ambientLight);
+
+                // Main directional light
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(20, 30, 20);
+                directionalLight.castShadow = true;
+                directionalLight.shadow.mapSize.width = 2048;
+                directionalLight.shadow.mapSize.height = 2048;
+                this.scene.add(directionalLight);
+
+                // Accent lights
+                const blueLight = new THREE.PointLight(0x00d4ff, 1, 50);
+                blueLight.position.set(-20, 15, -20);
+                this.scene.add(blueLight);
+
+                const orangeLight = new THREE.PointLight(0xff6b35, 1, 50);
+                orangeLight.position.set(20, 15, -20);
+                this.scene.add(orangeLight);
+            }
+
+            setupControls() {
+                const zoomSlider = document.getElementById('zoom-slider');
+                const rotationSlider = document.getElementById('rotation-slider');
+                const viewToggle = document.getElementById('view-toggle');
+                const resetBtn = document.getElementById('reset-btn');
+
+                zoomSlider.addEventListener('input', (e) => {
+                    const zoom = parseFloat(e.target.value);
+                    this.camera.position.setLength(zoom * 10);
+                });
+
+                rotationSlider.addEventListener('input', (e) => {
+                    const angle = parseFloat(e.target.value) * Math.PI / 180;
+                    const radius = this.camera.position.length();
+                    this.camera.position.x = Math.cos(angle) * radius * 0.7;
+                    this.camera.position.z = Math.sin(angle) * radius * 0.7;
+                    this.camera.lookAt(0, 0, 0);
+                });
+
+                viewToggle.addEventListener('click', () => {
+                    if (this.currentView === 'aerial') {
+                        // Street view
+                        this.camera.position.set(5, 3, 10);
+                        this.camera.lookAt(0, 2, 0);
+                        viewToggle.textContent = 'Vista Aérea';
+                        this.currentView = 'street';
+                    } else {
+                        // Aerial view
+                        this.camera.position.set(30, 25, 30);
+                        this.camera.lookAt(0, 0, 0);
+                        viewToggle.textContent = 'Vista Calle';
+                        this.currentView = 'aerial';
+                    }
+                });
+
+                resetBtn.addEventListener('click', () => {
+                    this.camera.position.set(30, 25, 30);
+                    this.camera.lookAt(0, 0, 0);
+                    zoomSlider.value = 5;
+                    rotationSlider.value = 45;
+                    viewToggle.textContent = 'Vista Calle';
+                    this.currentView = 'aerial';
+                });
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+
+                // Animate buildings (floating effect)
+                this.buildings.forEach((building, index) => {
+                    if (building.userData.type) {
+                        const time = Date.now() * 0.001;
+                        building.position.y = building.userData.originalY + 
+                            Math.sin(time + index * 0.5) * 0.2;
+                    }
+                });
+
+                // Animate central tower ring
+                this.scene.traverse((child) => {
+                    if (child.userData.isCore && child.userData.ring) {
+                        child.userData.ring.rotation.y += 0.02;
+                    }
+                });
+
+                // Animate robots
+                this.robots.forEach((robot) => {
+                    const userData = robot.userData;
+                    robot.position.x += Math.cos(userData.direction) * userData.moveSpeed;
+                    robot.position.z += Math.sin(userData.direction) * userData.moveSpeed;
+
+                    // Keep robots in bounds
+                    if (robot.position.x > 40 || robot.position.x < -40 ||
+                        robot.position.z > 40 || robot.position.z < -40) {
+                        userData.direction += Math.PI;
+                    }
+
+                    // Random direction changes
+                    if (Math.random() < 0.01) {
+                        userData.direction += (Math.random() - 0.5) * 0.5;
+                    }
+                });
+
+                // Auto-rotate scene slowly
+                this.scene.rotation.y += 0.001;
+
+                this.renderer.render(this.scene, this.camera);
+            }
+
+            updateStats() {
+                // Update building count
+                document.getElementById('building-count').textContent = this.buildings.length;
+                
+                // Simulate robot count changes
+                const currentCount = parseInt(document.getElementById('robot-count').textContent);
+                const variation = Math.floor(Math.random() * 10) - 5;
+                const newCount = Math.max(200, Math.min(300, currentCount + variation));
+                document.getElementById('robot-count').textContent = newCount;
+            }
+        }
+
+        // Initialize the 3D city viewer
+        const cityViewer = new CityViewer3D();
+
+        // Update stats periodically
+        setInterval(() => {
+            cityViewer.updateStats();
+        }, 5000);
+    </script>
+</body>
+</html>

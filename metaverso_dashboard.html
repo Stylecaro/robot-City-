@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciudad Robot Metaverso</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            text-align: center; 
+            padding: 50px;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: rgba(0,0,0,0.3);
+            padding: 30px;
+            border-radius: 15px;
+        }
+        h1 { font-size: 3em; margin-bottom: 20px; }
+        .status { 
+            background: rgba(255,255,255,0.1); 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 10px; 
+        }
+        .button {
+            background: #00ff88;
+            color: black;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        .button:hover { transform: scale(1.05); }
+        .unity-section {
+            margin-top: 30px;
+        }
+        .footer-text {
+            margin-top: 20px; 
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Ciudad Robot Metaverso 🌆</h1>
+        <div class="status">
+            <h3>Estado del Sistema: ✅ OPERATIVO</h3>
+            <p>🏭 Manufacturing Centers: Activos</p>
+            <p>🧬 Research Labs: Funcionando</p>
+            <p>🛡️ Security System: Protegiendo</p>
+            <p>🧠 AI Engine: Procesando</p>
+        </div>
+        
+        <button class="button" onclick="window.open('https://unity.com/download')">
+            🎮 Descargar Unity Hub
+        </button>
+        
+        <button class="button" onclick="alert('Sistema backend iniciándose...')">
+            🚀 Ver Estado Backend  
+        </button>
+        
+        <div class="unity-section">
+            <h3>📋 Próximos Pasos:</h3>
+            <p>1. Instalar Unity Hub desde el botón de arriba</p>
+            <p>2. Crear nuevo proyecto Unity 3D</p>
+            <p>3. Importar assets del metaverso</p>
+            <p>4. ¡Explorar la ciudad robot!</p>
+        </div>
+        
+        <div class="footer-text">
+            <p>⚡ Dashboard actualizado: 2025-10-01 23:57:36</p>
+        </div>
+    </div>
+    
+    <script>
+        // Animación simple
+        setInterval(() => {
+            const title = document.querySelector('h1');
+            title.style.textShadow = `0 0 ${Math.random() * 20}px #00ff88`;
+        }, 2000);
+    </script>
+</body>
+</html>

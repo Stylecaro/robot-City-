@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciudad Robot - Dashboard Profesional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem 2rem;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00ff88;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00ff88, #00ccff, #ff6b6b);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .metric-label {
+            color: #cccccc;
+            font-size: 0.9rem;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #00ff88;
+        }
+
+        .control-panel {
+            grid-column: span 3;
+            background: rgba(255, 255, 255, 0.1);
+            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-top: 1rem;
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .button {
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            color: #000000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            margin: 0.5rem;
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .button.secondary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: #ffffff;
+        }
+
+        .log-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .log-entry {
+            margin-bottom: 0.3rem;
+            opacity: 0.8;
+        }
+
+        .log-entry.info { color: #00ccff; }
+        .log-entry.success { color: #00ff88; }
+        .log-entry.warning { color: #ffaa00; }
+        .log-entry.error { color: #ff6b6b; }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .chart-container {
+            height: 100px;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 255, 136, 0.9);
+            color: #000000;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .control-panel {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .control-panel {
+                grid-column: span 1;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 Ciudad Robot - Dashboard Profesional</h1>
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-dot"></div>
+                <span>Sistema Operativo</span>
+            </div>
+            <div class="status-item">
+                <span>🔗 WebSocket: <span id="ws-status">Conectando...</span></span>
+            </div>
+            <div class="status-item">
+                <span>⏰ <span id="current-time">--:--:--</span></span>
+            </div>
+            <div class="status-item">
+                <span>👥 Clientes: <span id="client-count">0</span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Robots Card -->
+        <div class="card">
+            <h2>🤖 Robots</h2>
+            <div class="metric">
+                <span class="metric-label">Activos</span>
+                <span class="metric-value" id="robots-active">0</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Total</span>
+                <span class="metric-value" id="robots-total">0</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Eficiencia</span>
+                <span class="metric-value" id="robots-efficiency">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="robots-progress"></div>
+            </div>
+            <div class="chart-container" id="robots-chart"></div>
+        </div>
+
+        <!-- Manufacturing Card -->
+        <div class="card">
+            <h2>🏭 Manufactura</h2>
+            <div class="metric">
+                <span class="metric-label">Producción</span>
+                <span class="metric-value" id="manufacturing-rate">0</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Calidad</span>
+                <span class="metric-value" id="manufacturing-quality">0%</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Tiempo Activo</span>
+                <span class="metric-value" id="manufacturing-uptime">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="manufacturing-progress"></div>
+            </div>
+            <div class="chart-container" id="manufacturing-chart"></div>
+        </div>
+
+        <!-- Research Card -->
+        <div class="card">
+            <h2>🔬 Investigación</h2>
+            <div class="metric">
+                <span class="metric-label">Proyectos</span>
+                <span class="metric-value" id="research-projects">0</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Progreso</span>
+                <span class="metric-value" id="research-progress">0%</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Presupuesto</span>
+                <span class="metric-value" id="research-budget">$0M</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="research-progress-bar"></div>
+            </div>
+            <div class="chart-container" id="research-chart"></div>
+        </div>
+
+        <!-- Energy Card -->
+        <div class="card">
+            <h2>⚡ Energía</h2>
+            <div class="metric">
+                <span class="metric-label">Consumo</span>
+                <span class="metric-value" id="energy-consumption">0 kW</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Eficiencia</span>
+                <span class="metric-value" id="energy-efficiency">0%</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Estado</span>
+                <span class="metric-value" id="energy-status">Normal</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="energy-progress"></div>
+            </div>
+        </div>
+
+        <!-- Network Card -->
+        <div class="card">
+            <h2>🌐 Red</h2>
+            <div class="metric">
+                <span class="metric-label">Conexiones</span>
+                <span class="metric-value" id="network-connections">0</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Ancho de Banda</span>
+                <span class="metric-value" id="network-bandwidth">0%</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Estado</span>
+                <span class="metric-value" id="network-status">Conectado</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="network-progress"></div>
+            </div>
+        </div>
+
+        <!-- Security Card -->
+        <div class="card">
+            <h2>🛡️ Seguridad</h2>
+            <div class="metric">
+                <span class="metric-label">Nivel</span>
+                <span class="metric-value" id="security-level">Alto</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Alertas</span>
+                <span class="metric-value" id="security-alerts">0</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Estado</span>
+                <span class="metric-value" id="security-status">Seguro</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="security-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <h2>🎛️ Panel de Control Profesional</h2>
+        <div class="control-grid">
+            <div>
+                <h3>🚀 Aplicaciones</h3>
+                <a href="/advanced" class="button">Dashboard Avanzado</a>
+                <a href="/ciudad3d" class="button">Visor 3D</a>
+                <a href="/test" class="button secondary">Diagnóstico</a>
+            </div>
+            <div>
+                <h3>🔧 Sistema</h3>
+                <button class="button" onclick="restartSystem()">Reiniciar Sistema</button>
+                <button class="button secondary" onclick="exportLogs()">Exportar Logs</button>
+                <button class="button secondary" onclick="healthCheck()">Chequeo de Salud</button>
+            </div>
+            <div>
+                <h3>📊 APIs</h3>
+                <a href="/api/robots" class="button secondary">API Robots</a>
+                <a href="/api/metrics" class="button secondary">API Métricas</a>
+                <a href="/api/health" class="button secondary">API Salud</a>
+            </div>
+        </div>
+
+        <div class="log-container" id="log-container">
+            <div class="log-entry info">🚀 Sistema iniciado correctamente</div>
+            <div class="log-entry success">✅ WebSocket conectado</div>
+            <div class="log-entry info">📊 Cargando métricas en tiempo real...</div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script>
+        class ProfessionalDashboard {
+            constructor() {
+                this.socket = null;
+                this.isConnected = false;
+                this.metricsData = {};
+                this.logContainer = document.getElementById('log-container');
+                
+                this.init();
+            }
+
+            init() {
+                this.updateTime();
+                this.initWebSocket();
+                this.startMetricsUpdate();
+                
+                setInterval(() => this.updateTime(), 1000);
+                
+                this.addLog('🚀 Dashboard profesional iniciado', 'success');
+            }
+
+            updateTime() {
+                const now = new Date();
+                document.getElementById('current-time').textContent = now.toLocaleTimeString();
+            }
+
+            initWebSocket() {
+                try {
+                    this.socket = io();
+                    
+                    this.socket.on('connect', () => {
+                        this.isConnected = true;
+                        document.getElementById('ws-status').textContent = 'Conectado ✅';
+                        this.addLog('✅ WebSocket conectado exitosamente', 'success');
+                        this.showNotification('Sistema conectado', 'success');
+                    });
+
+                    this.socket.on('disconnect', () => {
+                        this.isConnected = false;
+                        document.getElementById('ws-status').textContent = 'Desconectado ❌';
+                        this.addLog('❌ WebSocket desconectado', 'warning');
+                    });
+
+                    this.socket.on('metrics_update', (data) => {
+                        this.updateMetrics(data);
+                    });
+
+                    this.socket.on('system_status', (data) => {
+                        this.addLog(`📊 Estado del sistema: ${data.system_health}`, 'info');
+                    });
+
+                } catch (error) {
+                    this.addLog(`❌ Error de conexión: ${error.message}`, 'error');
+                }
+            }
+
+            updateMetrics(data) {
+                try {
+                    // Update robots
+                    if (data.robots) {
+                        const activeRobots = data.robots.filter(r => r.status === 'active').length;
+                        const totalRobots = data.robots.length;
+                        const avgEfficiency = data.robots.reduce((sum, r) => sum + r.efficiency, 0) / totalRobots;
+
+                        document.getElementById('robots-active').textContent = activeRobots;
+                        document.getElementById('robots-total').textContent = totalRobots;
+                        document.getElementById('robots-efficiency').textContent = `${avgEfficiency.toFixed(1)}%`;
+                        document.getElementById('robots-progress').style.width = `${avgEfficiency}%`;
+                    }
+
+                    // Update manufacturing
+                    if (data.manufacturing) {
+                        const avgRate = data.manufacturing.reduce((sum, m) => sum + m.production_rate, 0) / data.manufacturing.length;
+                        const avgQuality = data.manufacturing.reduce((sum, m) => sum + m.quality_score, 0) / data.manufacturing.length;
+                        const avgUptime = data.manufacturing.reduce((sum, m) => sum + m.uptime, 0) / data.manufacturing.length;
+
+                        document.getElementById('manufacturing-rate').textContent = avgRate.toFixed(1);
+                        document.getElementById('manufacturing-quality').textContent = `${avgQuality.toFixed(1)}%`;
+                        document.getElementById('manufacturing-uptime').textContent = `${avgUptime.toFixed(1)}%`;
+                        document.getElementById('manufacturing-progress').style.width = `${avgQuality}%`;
+                    }
+
+                    // Update research
+                    if (data.research) {
+                        const totalProjects = data.research.length;
+                        const avgProgress = data.research.reduce((sum, r) => sum + r.progress, 0) / totalProjects;
+                        const totalBudget = data.research.reduce((sum, r) => sum + r.budget, 0) / 1000000;
+
+                        document.getElementById('research-projects').textContent = totalProjects;
+                        document.getElementById('research-progress').textContent = `${avgProgress.toFixed(1)}%`;
+                        document.getElementById('research-budget').textContent = `$${totalBudget.toFixed(1)}M`;
+                        document.getElementById('research-progress-bar').style.width = `${avgProgress}%`;
+                    }
+
+                    // Simulate other metrics
+                    this.updateSimulatedMetrics();
+
+                } catch (error) {
+                    this.addLog(`❌ Error actualizando métricas: ${error.message}`, 'error');
+                }
+            }
+
+            updateSimulatedMetrics() {
+                // Energy metrics
+                const energyConsumption = Math.floor(Math.random() * 500) + 1200;
+                const energyEfficiency = Math.floor(Math.random() * 20) + 80;
+                document.getElementById('energy-consumption').textContent = `${energyConsumption} kW`;
+                document.getElementById('energy-efficiency').textContent = `${energyEfficiency}%`;
+                document.getElementById('energy-progress').style.width = `${energyEfficiency}%`;
+
+                // Network metrics
+                const networkConnections = Math.floor(Math.random() * 100) + 200;
+                const networkBandwidth = Math.floor(Math.random() * 30) + 70;
+                document.getElementById('network-connections').textContent = networkConnections;
+                document.getElementById('network-bandwidth').textContent = `${networkBandwidth}%`;
+                document.getElementById('network-progress').style.width = `${networkBandwidth}%`;
+
+                // Security metrics
+                const securityAlerts = Math.floor(Math.random() * 3);
+                document.getElementById('security-alerts').textContent = securityAlerts;
+                document.getElementById('client-count').textContent = Math.floor(Math.random() * 10) + 1;
+            }
+
+            startMetricsUpdate() {
+                setInterval(() => {
+                    if (!this.isConnected) {
+                        this.updateSimulatedMetrics();
+                    }
+                }, 3000);
+            }
+
+            addLog(message, type = 'info') {
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry ${type}`;
+                logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                
+                this.logContainer.appendChild(logEntry);
+                this.logContainer.scrollTop = this.logContainer.scrollHeight;
+
+                // Keep only last 50 logs
+                while (this.logContainer.children.length > 50) {
+                    this.logContainer.removeChild(this.logContainer.firstChild);
+                }
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.getElementById('notification');
+                notification.textContent = message;
+                notification.className = `notification show ${type}`;
+                
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            }
+        }
+
+        // Global functions for buttons
+        function restartSystem() {
+            fetch('/api/system/restart', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    dashboard.addLog('🔄 Sistema reiniciado exitosamente', 'success');
+                    dashboard.showNotification('Sistema reiniciado', 'success');
+                })
+                .catch(error => {
+                    dashboard.addLog(`❌ Error reiniciando sistema: ${error.message}`, 'error');
+                });
+        }
+
+        function exportLogs() {
+            const logs = Array.from(document.querySelectorAll('.log-entry'))
+                .map(entry => entry.textContent)
+                .join('\n');
+            
+            const blob = new Blob([logs], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `metaverso-logs-${new Date().toISOString().slice(0, 10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            dashboard.addLog('📋 Logs exportados exitosamente', 'success');
+        }
+
+        function healthCheck() {
+            fetch('/health')
+                .then(response => response.json())
+                .then(data => {
+                    dashboard.addLog(`💚 Chequeo de salud: ${data.system_health}`, 'success');
+                    dashboard.showNotification(`Sistema: ${data.system_health}`, 'success');
+                })
+                .catch(error => {
+                    dashboard.addLog(`❌ Error en chequeo de salud: ${error.message}`, 'error');
+                });
+        }
+
+        // Initialize dashboard
+        const dashboard = new ProfessionalDashboard();
+    </script>
+</body>
+</html>
