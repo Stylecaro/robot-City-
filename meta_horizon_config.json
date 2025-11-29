@@ -1,0 +1,65 @@
+{
+  "platform": "Meta Horizon Worlds",
+  "project_info": {
+    "name": "Metaverso Professional City",
+    "description": "Advanced AI-powered virtual city with intelligent robots and autonomous systems",
+    "category": "Social/Educational/Gaming",
+    "max_capacity": 50,
+    "age_rating": "13+"
+  },
+  "world_settings": {
+    "physics_enabled": true,
+    "gravity": -9.81,
+    "collision_detection": "advanced",
+    "rendering_quality": "high"
+  },
+  "avatar_system": {
+    "custom_avatars": true,
+    "avatar_scaling": {
+      "min_height": 0.5,
+      "max_height": 2.5
+    },
+    "emotes_enabled": true,
+    "voice_chat": true
+  },
+  "interactive_elements": {
+    "ai_robots": {
+      "enabled": true,
+      "max_count": 100,
+      "behavior_trees": true,
+      "pathfinding": "navmesh"
+    },
+    "buildings": {
+      "interactive": true,
+      "enterable": true,
+      "customizable": true
+    },
+    "vehicles": {
+      "enabled": true,
+      "types": ["car", "bike", "drone"],
+      "physics_simulation": true
+    }
+  },
+  "scripting": {
+    "language": "JavaScript/TypeScript",
+    "api_version": "latest",
+    "custom_scripts_enabled": true
+  },
+  "networking": {
+    "multiplayer": true,
+    "real_time_sync": true,
+    "voice_proximity": true,
+    "max_players": 50
+  },
+  "monetization": {
+    "enabled": false,
+    "virtual_currency": "Meta Credits",
+    "in_world_purchases": false
+  },
+  "export_format": {
+    "type": "glTF 2.0",
+    "textures": "PBR",
+    "compression": "draco",
+    "lod_levels": 3
+  }
+}

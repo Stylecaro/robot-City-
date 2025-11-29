@@ -1,0 +1,67 @@
+{
+  "platform": "Spatial.io",
+  "project_info": {
+    "name": "Metaverso Professional",
+    "description": "AI-driven virtual city with advanced robotics and autonomous systems",
+    "category": "Experience",
+    "visibility": "public",
+    "featured": true
+  },
+  "space_settings": {
+    "max_visitors": 50,
+    "space_type": "custom",
+    "environment": "outdoor_city",
+    "time_of_day": "dynamic",
+    "weather": "dynamic"
+  },
+  "3d_assets": {
+    "format": "glTF/GLB",
+    "max_file_size": "100MB",
+    "texture_resolution": "2048x2048",
+    "polygon_budget": 500000,
+    "materials": "PBR"
+  },
+  "interactive_features": {
+    "clickable_objects": true,
+    "animations": true,
+    "particle_effects": true,
+    "audio_zones": true,
+    "video_screens": true,
+    "portals": true
+  },
+  "ai_integration": {
+    "npc_robots": {
+      "enabled": true,
+      "ai_behavior": "advanced",
+      "dialogue_system": true,
+      "pathfinding": true
+    },
+    "voice_commands": true,
+    "gesture_recognition": true
+  },
+  "multiplayer": {
+    "enabled": true,
+    "voice_chat": true,
+    "spatial_audio": true,
+    "avatar_customization": true,
+    "emotes": true
+  },
+  "scripting": {
+    "language": "TypeScript",
+    "sdk_version": "latest",
+    "custom_components": true,
+    "event_system": true
+  },
+  "analytics": {
+    "visitor_tracking": true,
+    "engagement_metrics": true,
+    "heatmaps": true
+  },
+  "deployment": {
+    "url": "",
+    "custom_domain": false,
+    "embed_enabled": true,
+    "mobile_optimized": true,
+    "vr_compatible": true
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "project_name": "Metaverso Professional",
+  "version": "2.0.0",
+  "blockchain_platforms": {
+    "ethereum": {
+      "network": "mainnet",
+      "contract_address": "",
+      "gas_limit": 3000000,
+      "supported_tokens": ["ETH", "USDT", "DAI"]
+    },
+    "polygon": {
+      "network": "polygon-mainnet",
+      "contract_address": "",
+      "gas_limit": 2000000,
+      "supported_tokens": ["MATIC", "USDC"]
+    },
+    "binance_smart_chain": {
+      "network": "bsc-mainnet",
+      "contract_address": "",
+      "gas_limit": 2500000,
+      "supported_tokens": ["BNB", "BUSD"]
+    }
+  },
+  "nft_configuration": {
+    "collection_name": "Metaverso Virtual City",
+    "symbol": "MVC",
+    "base_uri": "https://metaverso.io/nft/",
+    "royalty_percentage": 5,
+    "max_supply": 10000
+  },
+  "smart_contracts": {
+    "land_ownership": {
+      "contract_type": "ERC721",
+      "features": ["transfer", "mint", "burn", "metadata"]
+    },
+    "virtual_currency": {
+      "contract_type": "ERC20",
+      "token_name": "MetaversoToken",
+      "token_symbol": "MVT",
+      "initial_supply": 1000000000
+    },
+    "marketplace": {
+      "contract_type": "ERC1155",
+      "features": ["auction", "fixed_price", "royalties"]
+    }
+  },
+  "ipfs_storage": {
+    "provider": "pinata",
+    "api_key": "",
+    "secret_key": "",
+    "gateway": "https://gateway.pinata.cloud/ipfs/"
+  }
+}
