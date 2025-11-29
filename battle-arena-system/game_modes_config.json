@@ -248,5 +248,111 @@
       "tradeable": true,
       "marketplace": "integrated"
     }
+  },
+  "ai_bots": {
+    "enabled": true,
+    "auto_fill": true,
+    "max_bots": 50,
+    "skill_levels": {
+      "casual": 0.3,
+      "ranked": 0.6,
+      "tournament": 0.8,
+      "high_stakes": 0.9
+    },
+    "bot_types": {
+      "humanoid": 0.6,
+      "terminator": 0.3,
+      "combat_drone": 0.1
+    },
+    "loot_drop": {
+      "min_tokens": 10,
+      "max_tokens": 50,
+      "drop_weapons": true
+    },
+    "behavior": {
+      "detection_range": {
+        "humanoid": 40,
+        "terminator": 60,
+        "combat_drone": 70
+      },
+      "reaction_time": {
+        "humanoid": 0.5,
+        "terminator": 0.2,
+        "combat_drone": 0.1
+      },
+      "aim_accuracy": {
+        "humanoid": 0.65,
+        "terminator": 0.85,
+        "combat_drone": 0.90
+      }
+    }
+  },
+  "vehicles": {
+    "enabled": true,
+    "max_vehicles": 10,
+    "respawn_time": 60,
+    "spawn_distribution": {
+      "combat_tank": 0.15,
+      "armored_car": 0.35,
+      "attack_drone": 0.20,
+      "destroyer_mech": 0.10,
+      "excavator": 0.20
+    },
+    "vehicle_stats": {
+      "combat_tank": {
+        "health": 1000,
+        "max_speed": 15,
+        "damage": 100,
+        "fire_rate": 1.0,
+        "passengers": 2
+      },
+      "armored_car": {
+        "health": 300,
+        "max_speed": 40,
+        "damage": 30,
+        "fire_rate": 5.0,
+        "passengers": 4
+      },
+      "attack_drone": {
+        "health": 200,
+        "max_speed": 50,
+        "damage": 25,
+        "fire_rate": 10.0,
+        "passengers": 1
+      },
+      "destroyer_mech": {
+        "health": 1500,
+        "max_speed": 10,
+        "damage": 150,
+        "fire_rate": 0.5,
+        "passengers": 1
+      },
+      "excavator": {
+        "health": 800,
+        "max_speed": 8,
+        "damage": 200,
+        "fire_rate": 2.0,
+        "passengers": 1,
+        "special": "building_destruction"
+      }
+    },
+    "rewards": {
+      "vehicle_kill_bonus": 50,
+      "vehicle_destruction_penalty": -10,
+      "multi_kill_bonus": 100,
+      "building_destruction": 10
+    }
+  },
+  "combat_bonuses": {
+    "bot_kill": 15,
+    "player_kill": 25,
+    "vehicle_kill": 50,
+    "vehicle_assisted_kill": 35,
+    "building_destruction": 10,
+    "headshot": 10,
+    "double_kill": 25,
+    "triple_kill": 50,
+    "quad_kill": 100,
+    "rampage": 200
   }
 }
