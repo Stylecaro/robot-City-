@@ -1,0 +1,252 @@
+{
+  "game_modes": {
+    "casual": {
+      "name": "Partida Casual",
+      "entry_fee": 0,
+      "description": "Modo gratuito para practicar sin riesgo",
+      "max_players": 100,
+      "rewards": {
+        "kill_bonus": 25,
+        "victory_bonus": 500,
+        "participation": 50
+      },
+      "death_penalty": "none"
+    },
+    "ranked": {
+      "name": "Partida Ranked",
+      "entry_fee": 10,
+      "description": "Modo competitivo con apuestas. 70% del pool para premios",
+      "max_players": 100,
+      "prize_pool_distribution": {
+        "prizes": 0.70,
+        "operating_costs": 0.25,
+        "platform_fee": 0.05
+      },
+      "rewards": {
+        "kill_bonus": 25,
+        "loot_drop": true
+      },
+      "death_penalty": "lose_all_carried_tokens",
+      "minimum_balance": 20
+    },
+    "tournament": {
+      "name": "Torneo",
+      "entry_fee": 50,
+      "description": "Evento programado con grandes premios",
+      "max_players": 100,
+      "scheduled": true,
+      "prize_pool_distribution": {
+        "prizes": 0.70,
+        "operating_costs": 0.25,
+        "platform_fee": 0.05
+      },
+      "top_8_distribution": {
+        "1st": 0.40,
+        "2nd": 0.25,
+        "3rd": 0.15,
+        "4th": 0.08,
+        "5th": 0.05,
+        "6th": 0.03,
+        "7th": 0.02,
+        "8th": 0.02
+      },
+      "death_penalty": "lose_all_carried_tokens",
+      "minimum_balance": 100,
+      "nft_rewards": true
+    },
+    "high_stakes": {
+      "name": "High Stakes Arena",
+      "entry_fee": 100,
+      "description": "Máximo riesgo, máxima recompensa",
+      "max_players": 50,
+      "prize_pool_distribution": {
+        "prizes": 0.75,
+        "operating_costs": 0.20,
+        "platform_fee": 0.05
+      },
+      "rewards": {
+        "kill_bonus": 50,
+        "loot_drop": true,
+        "headshot_bonus": 25
+      },
+      "death_penalty": "lose_all_carried_tokens_and_inventory",
+      "minimum_balance": 200,
+      "insurance_available": true
+    },
+    "exploration": {
+      "name": "Mundo Abierto",
+      "entry_fee": 0,
+      "description": "Explora, completa misiones y gana recompensas",
+      "max_players": 20,
+      "map_type": "open_world",
+      "rewards": {
+        "quest_completion": 100,
+        "discovery_bonus": 50,
+        "npc_interaction": 25
+      },
+      "death_penalty": "lose_10_percent",
+      "pvp_enabled": false
+    },
+    "learning": {
+      "name": "Zona de Aprendizaje",
+      "entry_fee": 0,
+      "description": "Tutoriales, práctica y educación",
+      "max_players": 10,
+      "map_type": "learning_zone",
+      "rewards": {
+        "tutorial_completion": 50,
+        "achievement": 100,
+        "practice_time": 10
+      },
+      "death_penalty": "none",
+      "pvp_enabled": false
+    }
+  },
+  "maps": {
+    "battle_arena": {
+      "name": "Crypto Combat Island",
+      "type": "battle_royale",
+      "size": 5000,
+      "terrain": "island",
+      "buildings": 150,
+      "weapon_spawns": 50,
+      "power_ups": 30,
+      "vegetation": 500,
+      "spawn_points": 100,
+      "safe_zone": {
+        "initial_radius": 2500,
+        "final_radius": 50,
+        "shrink_interval": 60,
+        "damage_per_second": 10
+      }
+    },
+    "open_world": {
+      "name": "MetaCity",
+      "type": "exploration",
+      "size": 10000,
+      "cities": 5,
+      "npcs": 50,
+      "learning_stations": 20,
+      "forests": 10,
+      "spawn_points": 20,
+      "quests": "unlimited"
+    },
+    "learning_zone": {
+      "name": "Training Academy",
+      "type": "educational",
+      "size": 2000,
+      "learning_rooms": 15,
+      "practice_zones": 10,
+      "tutorial_stations": 25,
+      "practice_arena": 1,
+      "spawn_points": 1
+    },
+    "tournament_arena": {
+      "name": "Championship Dome",
+      "type": "competitive",
+      "size": 5000,
+      "symmetrical": true,
+      "balanced_spawns": 100,
+      "weapon_balance": "enforced",
+      "spectator_mode": true
+    }
+  },
+  "death_drop_mechanics": {
+    "drop_on_death": true,
+    "drop_percentage": 1.0,
+    "loot_box_duration": 300,
+    "items_dropped": {
+      "carried_tokens": true,
+      "equipped_weapons": true,
+      "inventory_items": true,
+      "nfts": false
+    },
+    "killer_receives": "auto_transfer",
+    "insurance": {
+      "available": true,
+      "cost_percentage": 0.10,
+      "protection_percentage": 0.50,
+      "modes": ["high_stakes", "tournament"]
+    }
+  },
+  "economy": {
+    "token_name": "MVT",
+    "token_value_usd": 0.50,
+    "minimum_balance_to_play": 20,
+    "transaction_fees": {
+      "entry_fee": 0,
+      "withdrawal": 0.02,
+      "transfer": 0.01
+    },
+    "daily_limits": {
+      "max_entry_fees": 1000,
+      "max_withdrawals": 5000
+    },
+    "rewards": {
+      "victory": {
+        "casual": 500,
+        "ranked": "40% of pool",
+        "tournament": "40% of pool",
+        "high_stakes": "40% of pool"
+      },
+      "kill": {
+        "casual": 25,
+        "ranked": 25,
+        "tournament": 25,
+        "high_stakes": 50
+      },
+      "headshot": {
+        "all_modes": 10
+      },
+      "damage_per_point": 0.1,
+      "survival_per_second": 0.5
+    }
+  },
+  "safety_features": {
+    "anti_cheat": {
+      "server_validation": true,
+      "rate_limiting": true,
+      "automated_detection": true
+    },
+    "player_protection": {
+      "balance_verification": true,
+      "fraud_detection": true,
+      "dispute_resolution": true
+    },
+    "responsible_gaming": {
+      "daily_loss_limit": 500,
+      "session_time_warnings": true,
+      "self_exclusion": true
+    }
+  },
+  "nft_integration": {
+    "victory_nfts": {
+      "legendary": {
+        "drop_rate": 0.01,
+        "min_kills": 100,
+        "token_value": 5000
+      },
+      "epic": {
+        "drop_rate": 0.05,
+        "min_kills": 50,
+        "token_value": 1000
+      },
+      "rare": {
+        "drop_rate": 0.15,
+        "min_kills": 25,
+        "token_value": 250
+      },
+      "common": {
+        "drop_rate": 0.79,
+        "min_kills": 10,
+        "token_value": 50
+      }
+    },
+    "weapon_skins": {
+      "nft_based": true,
+      "stat_boost": true,
+      "tradeable": true,
+      "marketplace": "integrated"
+    }
+  }
+}

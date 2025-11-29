@@ -1,0 +1,398 @@
+{
+  "meta_horizon_combat_arenas": {
+    "project_name": "VR Battle Arena - Play to Earn",
+    "description": "Arenas de combate estilo Population One con recompensas en criptomonedas y NFTs para Meta Quest",
+    "platform": "Meta Horizon Worlds",
+    "max_capacity": 100,
+    "arenas": [
+      {
+        "id": "br_arena_001",
+        "name": "Crypto Combat Island",
+        "type": "battle_royale",
+        "max_players": 100,
+        "map_config": {
+          "size_meters": 5000,
+          "height_limit": 500,
+          "terrain_type": "island",
+          "buildings": 150,
+          "vehicles": true,
+          "weather_effects": true
+        },
+        "gameplay": {
+          "match_duration": "20-30 minutes",
+          "spawn_mode": "random_distributed",
+          "safe_zone": {
+            "initial_radius": 2500,
+            "final_radius": 50,
+            "shrink_intervals": 60,
+            "damage_per_second": 10
+          },
+          "loot_tiers": ["common", "rare", "epic", "legendary"]
+        },
+        "rewards": {
+          "winner": {
+            "tokens": 1000,
+            "nft_chance": 0.75,
+            "xp": 5000
+          },
+          "top_10": {
+            "tokens": 250,
+            "nft_chance": 0.25,
+            "xp": 2000
+          },
+          "participation": {
+            "tokens": 50,
+            "xp": 500
+          }
+        }
+      },
+      {
+        "id": "tdm_arena_002",
+        "name": "Team Deathmatch Arena",
+        "type": "team_deathmatch",
+        "max_players": 20,
+        "map_config": {
+          "size_meters": 500,
+          "layout": "symmetrical",
+          "cover_density": "high",
+          "spawn_zones": 2
+        },
+        "gameplay": {
+          "teams": 2,
+          "players_per_team": 10,
+          "score_limit": 100,
+          "time_limit": "15 minutes",
+          "respawn_time": 5
+        },
+        "rewards": {
+          "winning_team": {
+            "tokens_per_player": 150,
+            "bonus_multiplier": 1.5
+          },
+          "mvp": {
+            "tokens": 300,
+            "nft_guaranteed": true
+          }
+        }
+      },
+      {
+        "id": "ctf_arena_003",
+        "name": "Capture The Flag - Crypto Edition",
+        "type": "capture_the_flag",
+        "max_players": 16,
+        "map_config": {
+          "size_meters": 800,
+          "bases": 2,
+          "neutral_zones": 3
+        },
+        "gameplay": {
+          "teams": 2,
+          "flags_to_win": 3,
+          "flag_carrier_speed": 0.8,
+          "flag_return_time": 30
+        },
+        "rewards": {
+          "flag_capture": 100,
+          "flag_defense": 50,
+          "winning_team": 200
+        }
+      }
+    ],
+    "weapons_system": {
+      "weapon_categories": [
+        {
+          "type": "assault_rifle",
+          "damage": 25,
+          "fire_rate": 600,
+          "magazine_size": 30,
+          "reload_time": 2.5,
+          "nft_skins_available": true
+        },
+        {
+          "type": "shotgun",
+          "damage": 80,
+          "fire_rate": 100,
+          "magazine_size": 8,
+          "reload_time": 3.0,
+          "nft_skins_available": true
+        },
+        {
+          "type": "sniper_rifle",
+          "damage": 150,
+          "fire_rate": 45,
+          "magazine_size": 5,
+          "reload_time": 3.5,
+          "nft_skins_available": true
+        },
+        {
+          "type": "energy_weapon",
+          "damage": 35,
+          "fire_rate": 400,
+          "magazine_size": 50,
+          "reload_time": 2.0,
+          "nft_skins_available": true,
+          "special_effect": "shield_penetration"
+        }
+      ],
+      "nft_weapon_skins": {
+        "legendary": {
+          "drop_rate": 0.01,
+          "stat_boost": 0.10,
+          "trade_value": 5000
+        },
+        "epic": {
+          "drop_rate": 0.05,
+          "stat_boost": 0.05,
+          "trade_value": 1000
+        },
+        "rare": {
+          "drop_rate": 0.15,
+          "stat_boost": 0.02,
+          "trade_value": 250
+        }
+      }
+    },
+    "power_ups": [
+      {
+        "name": "Shield Boost",
+        "effect": "+50 armor",
+        "duration": 30,
+        "respawn_time": 60
+      },
+      {
+        "name": "Speed Boost",
+        "effect": "+30% movement speed",
+        "duration": 15,
+        "respawn_time": 45
+      },
+      {
+        "name": "Damage Amplifier",
+        "effect": "+50% damage",
+        "duration": 20,
+        "respawn_time": 90
+      },
+      {
+        "name": "Invisibility",
+        "effect": "stealth mode",
+        "duration": 10,
+        "respawn_time": 120
+      }
+    ],
+    "vr_controls": {
+      "movement": "joystick_locomotion",
+      "turning": "smooth_snap_turning",
+      "weapon_handling": "realistic_two_handed",
+      "climbing": "hand_over_hand",
+      "flying": "wingsuit_mechanics",
+      "comfort_options": {
+        "vignette": true,
+        "teleport_option": true,
+        "seated_mode": false
+      }
+    },
+    "multiplayer": {
+      "matchmaking": {
+        "skill_based": true,
+        "region_priority": true,
+        "party_size": 4,
+        "fill_empty_slots": true
+      },
+      "voice_chat": {
+        "enabled": true,
+        "proximity_based": true,
+          "team_only_option": true,
+        "mute_options": true
+      },
+      "netcode": {
+        "tick_rate": 60,
+        "lag_compensation": true,
+        "hit_registration": "server_authoritative"
+      }
+    },
+    "crypto_integration": {
+      "token": "MVT",
+      "blockchain": "Polygon",
+      "wallet_integration": "MetaMask",
+      "nft_standard": "ERC721",
+      "marketplace": {
+        "enabled": true,
+        "trading_fee": 0.025,
+        "royalties": 0.05
+      },
+      "staking": {
+        "enabled": true,
+        "daily_reward_rate": 0.05,
+        "minimum_stake_duration": 7
+      }
+    },
+    "tournaments": {
+      "daily": {
+        "frequency": "every_6_hours",
+        "prize_pool": 5000,
+        "entry_fee": 50,
+        "max_participants": 100
+      },
+      "weekly": {
+        "frequency": "sunday_8pm_utc",
+        "prize_pool": 50000,
+        "entry_fee": 100,
+        "max_participants": 200
+      },
+      "monthly_championship": {
+        "frequency": "last_sunday",
+        "prize_pool": 200000,
+        "entry_fee": 500,
+        "max_participants": 500,
+        "qualification_required": true
+      }
+    },
+    "season_pass": {
+      "duration_days": 90,
+      "levels": 100,
+      "free_track": {
+        "tokens_total": 5000,
+        "nfts": 5
+      },
+      "premium_track": {
+        "cost": 1000,
+        "tokens_total": 25000,
+        "nfts": 20,
+        "exclusive_skins": 10
+      }
+    },
+    "social_features": {
+      "clans": {
+        "max_members": 50,
+        "clan_wars": true,
+        "shared_rewards": true
+      },
+      "friends_list": {
+        "max_friends": 200,
+        "party_invites": true,
+        "spectate_mode": true
+      },
+      "leaderboards": {
+        "global": true,
+        "regional": true,
+        "clan_based": true,
+        "seasonal": true,
+        "rewards": {
+          "top_10": 10000,
+          "top_100": 1000,
+          "top_1000": 100
+        }
+      }
+    },
+    "anti_cheat": {
+      "system": "server_side_validation",
+      "reporting": true,
+      "automated_detection": true,
+      "penalties": {
+        "first_offense": "warning",
+        "second_offense": "24h_ban",
+        "third_offense": "permanent_ban"
+      }
+    }
+  },
+  "spatial_io_arenas": {
+    "project_name": "Spatial Combat Zones",
+    "description": "Arenas de combate multijugador para Spatial.io con NFTs y criptomonedas",
+    "platform": "Spatial.io",
+    "max_capacity": 50,
+    "arenas": [
+      {
+        "id": "spatial_br_001",
+        "name": "Urban Warfare Arena",
+        "type": "battle_royale",
+        "max_players": 50,
+        "environment": "urban_cityscape",
+        "glb_assets": [
+          "buildings_pack.glb",
+          "vehicles_pack.glb",
+          "weapons_pack.glb",
+          "props_pack.glb"
+        ],
+        "scripting": {
+          "language": "TypeScript",
+          "systems": [
+            "spawn_management.ts",
+            "weapon_mechanics.ts",
+            "zone_controller.ts",
+            "reward_distributor.ts"
+          ]
+        }
+      },
+      {
+        "id": "spatial_arena_002",
+        "name": "Futuristic Combat Dome",
+        "type": "team_deathmatch",
+        "max_players": 20,
+        "environment": "sci_fi_dome",
+        "special_features": [
+          "gravity_zones",
+          "energy_shields",
+          "teleportation_pads",
+          "holographic_decoys"
+        ]
+      }
+    ],
+    "nft_integration": {
+      "avatar_nfts": {
+        "enabled": true,
+        "rarity_levels": ["common", "rare", "epic", "legendary"],
+        "stat_bonuses": true
+      },
+      "land_ownership": {
+        "enabled": true,
+        "arena_plots": 100,
+        "revenue_share": 0.10,
+        "customization": true
+      }
+    },
+    "monetization": {
+      "entry_fees": {
+        "casual_match": 0,
+        "ranked_match": 10,
+        "tournament": 50
+      },
+      "rewards_pool": {
+        "match_based": 0.70,
+        "tournament": 0.25,
+        "staking": 0.05
+      }
+    }
+  },
+  "technical_specs": {
+    "unity_version": "2021.3 LTS",
+    "horizon_sdk": "latest",
+    "spatial_sdk": "latest",
+    "networking": "Photon PUN 2",
+    "blockchain_sdk": "Web3Unity",
+    "ipfs_storage": "Pinata",
+    "smart_contracts": {
+      "token_contract": "ERC20_MVT.sol",
+      "nft_contract": "ERC721_BattleNFT.sol",
+      "marketplace_contract": "NFTMarketplace.sol",
+      "staking_contract": "StakingRewards.sol"
+    }
+  },
+  "deployment": {
+    "meta_horizon": {
+      "world_upload": true,
+      "scripting_enabled": true,
+      "max_script_size_kb": 500,
+      "asset_optimization": "draco_compression"
+    },
+    "spatial_io": {
+      "space_publish": true,
+      "typescript_bundle": true,
+      "glb_max_size_mb": 100,
+      "multiplayer_enabled": true
+    },
+    "blockchain": {
+      "testnet_deployment": true,
+      "mainnet_deployment": false,
+      "networks": ["Polygon", "BSC", "Ethereum"]
+    }
+  }
+}
