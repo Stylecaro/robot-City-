@@ -170,7 +170,7 @@
     }
   },
   "economy": {
-    "token_name": "MVT",
+    "token_name": "EVT",
     "token_value_usd": 0.50,
     "minimum_balance_to_play": 20,
     "transaction_fees": {

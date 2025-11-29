@@ -55,7 +55,7 @@ class Arena:
     power_ups: List[Dict]
     active_players: List[Player] = None
     start_time: Optional[datetime] = None
-    prize_pool: float = 0.0  # En tokens MVT
+    prize_pool: float = 0.0  # En tokens EVT
     
     def __post_init__(self):
         if self.active_players is None:
@@ -104,7 +104,7 @@ class CombatArenaSystem:
                 {"type": "weapon_upgrade", "positions": [], "respawn_time": 60},
                 {"type": "shield", "positions": [], "respawn_time": 90}
             ],
-            prize_pool=max_players * 10.0  # 10 MVT tokens por jugador
+            prize_pool=max_players * 10.0  # 10 EVT tokens por jugador
         )
         
         self.active_arenas[arena.id] = arena
@@ -151,7 +151,7 @@ class CombatArenaSystem:
         
         print(f"🎮 INICIANDO PARTIDA: {arena.name}")
         print(f"📊 Jugadores: {len(arena.active_players)}/{arena.max_players}")
-        print(f"💰 Premio acumulado: {arena.prize_pool} MVT tokens")
+        print(f"💰 Premio acumulado: {arena.prize_pool} EVT tokens")
         
         # Simular progresión de la partida
         await self._run_match_loop(arena_id)
@@ -210,11 +210,11 @@ class CombatArenaSystem:
         third_place_tokens = arena.prize_pool * 0.20  # 20% al tercero
         
         print(f"\n🏆 GANADOR: {winner.username}")
-        print(f"💰 Premio: {winner_tokens} MVT tokens")
+        print(f"💰 Premio: {winner_tokens} EVT tokens")
         
         # Generar NFT especial para el ganador
         nft_reward = self._generate_nft_reward(winner, "champion")
-        print(f"🎁 NFT Recompensa: {nft_reward['name']} (Valor: {nft_reward['value']} MVT)")
+        print(f"🎁 NFT Recompensa: {nft_reward['name']} (Valor: {nft_reward['value']} EVT)")
         
         # Enviar transacción blockchain
         await self._send_blockchain_reward(winner.wallet_address, winner_tokens, nft_reward)
@@ -333,7 +333,7 @@ if __name__ == "__main__":
         # Crear arena Battle Royale
         arena = system.create_battle_royale_arena("Population One Style Arena", max_players=50)
         print(f"✅ Arena creada: {arena.name}")
-        print(f"💰 Premio acumulado: {arena.prize_pool} MVT tokens")
+        print(f"💰 Premio acumulado: {arena.prize_pool} EVT tokens")
         
         # Simular jugadores uniéndose
         for i in range(50):
@@ -353,3 +353,4 @@ if __name__ == "__main__":
         print(f"Estado: {stats['status']}")
     
     asyncio.run(main())
+

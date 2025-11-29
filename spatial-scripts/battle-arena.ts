@@ -10,7 +10,7 @@ export const ArenaConfig = {
   safeZoneRadius: 1500,
   shrinkInterval: 45,
   damagePerSecond: 10,
-  tokenContract: '0x...', // Dirección del contrato MVT
+  tokenContract: '0x...', // Dirección del contrato EVT
   nftContract: '0x...'   // Dirección del contrato NFT
 };
 
@@ -252,14 +252,14 @@ export class BattleArenaSystem extends SpatialComponentSystem {
   }
   
   async rewardKill(killer: PlayerData) {
-    const killReward = 25; // MVT tokens por kill
+    const killReward = 25; // EVT tokens por kill
     
     if (killer.walletAddress) {
       try {
         // Enviar recompensa (integración con blockchain)
         await this.sendTokenReward(killer.walletAddress, killReward);
         
-        console.log(`💰 ${killer.name} ganó ${killReward} MVT por el kill`);
+        console.log(`💰 ${killer.name} ganó ${killReward} EVT por el kill`);
       } catch (error) {
         console.error('Error enviando recompensa:', error);
       }
@@ -311,7 +311,7 @@ export class BattleArenaSystem extends SpatialComponentSystem {
   
   showVictoryScreen(winner: PlayerData, reward: number) {
     this.broadcastMessage(
-      `🏆 ¡${winner.name} GANÓ!\n💰 Recompensa: ${reward} MVT\n💀 Kills: ${winner.kills}`,
+      `🏆 ¡${winner.name} GANÓ!\n💰 Recompensa: ${reward} EVT\n💀 Kills: ${winner.kills}`,
       'success'
     );
   }
@@ -346,7 +346,7 @@ export class BattleArenaSystem extends SpatialComponentSystem {
   
   async sendTokenReward(wallet: string, amount: number) {
     // Integración con Web3
-    console.log(`💰 Enviando ${amount} MVT a ${wallet}`);
+    console.log(`💰 Enviando ${amount} EVT a ${wallet}`);
     
     // Aquí iría la llamada real al smart contract
     // await tokenContract.transfer(wallet, amount);
@@ -444,3 +444,4 @@ interface PlayerData {
 
 // Exportar sistema
 export default BattleArenaSystem;
+

@@ -256,7 +256,7 @@ namespace BattleArena
                                    $"Kills: {kills}\n" +
                                    $"Daño infligido: {damageDealt:F0}\n" +
                                    $"Tiempo de supervivencia: {FormatTime(survivalTime)}\n" +
-                                   $"Tokens ganados: {CalculateTokenReward():F0} MVT";
+                                   $"Tokens ganados: {CalculateTokenReward():F0} EVT";
                 }
             }
         }
@@ -340,3 +340,4 @@ namespace BattleArena
         }
     }
 }
+

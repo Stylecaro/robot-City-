@@ -48,7 +48,7 @@ namespace BattleArena
                 // Remover tokens del jugador
                 victim.carriedTokens = 0;
                 
-                Debug.Log($"💰 {victim.playerName} dropeo {tokensToDrop} MVT");
+                Debug.Log($"💰 {victim.playerName} dropeo {tokensToDrop} EVT");
                 
                 // Notificar al killer
                 if (killer != null)
@@ -150,7 +150,7 @@ namespace BattleArena
         /// </summary>
         IEnumerator TransferDroppedTokens(BattlePlayer victim, BattlePlayer killer, float amount)
         {
-            Debug.Log($"💸 Transfiriendo {amount} MVT de {victim.playerName} a {killer.playerName}");
+            Debug.Log($"💸 Transfiriendo {amount} EVT de {victim.playerName} a {killer.playerName}");
             
             // Opción 1: Transfer directo (el killer obtiene los tokens inmediatamente)
             killer.carriedTokens += amount;
@@ -166,7 +166,7 @@ namespace BattleArena
         [PunRPC]
         void RPC_NotifyLootAvailable(float amount, string victimName)
         {
-            Debug.Log($"💰 ¡{victimName} dropeo {amount} MVT! Recógelo rápido");
+            Debug.Log($"💰 ¡{victimName} dropeo {amount} EVT! Recógelo rápido");
             // Mostrar notificación en UI
         }
     }
@@ -221,7 +221,7 @@ namespace BattleArena
         {
             isLooted = true;
             
-            Debug.Log($"🎁 {player.playerName} recogió {tokenAmount} MVT de {originalOwner}");
+            Debug.Log($"🎁 {player.playerName} recogió {tokenAmount} EVT de {originalOwner}");
             
             // Añadir tokens al jugador
             player.carriedTokens += tokenAmount;
@@ -246,7 +246,7 @@ namespace BattleArena
         [PunRPC]
         void RPC_LootCollected(string playerName, float amount)
         {
-            Debug.Log($"📦 {playerName} recogió {amount} MVT del botín");
+            Debug.Log($"📦 {playerName} recogió {amount} EVT del botín");
         }
     }
     
@@ -285,3 +285,4 @@ namespace BattleArena
         public string nftRarity;
     }
 }
+

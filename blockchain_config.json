@@ -35,8 +35,8 @@
     },
     "virtual_currency": {
       "contract_type": "ERC20",
-      "token_name": "MetaversoToken",
-      "token_symbol": "MVT",
+      "token_name": "EvolucionToken",
+      "token_symbol": "EVT",
       "initial_supply": 1000000000
     },
     "marketplace": {

@@ -33,7 +33,7 @@ class PlayToEarnSystem:
     
     def __init__(self, web3_provider: str = "https://polygon-mainnet.infura.io/v3/YOUR_INFURA_KEY"):
         self.w3 = Web3(Web3.HTTPProvider(web3_provider))
-        self.token_contract_address = "0x..."  # Dirección del contrato MVT Token
+        self.token_contract_address = "0x..."  # Dirección del contrato EVT Token
         self.nft_contract_address = "0x..."   # Dirección del contrato NFT
         self.reward_pools: Dict[str, float] = {
             "daily_missions": 10000.0,
@@ -190,9 +190,9 @@ class PlayToEarnSystem:
             
             # Crear transacción de recompensa
             reward = CryptoReward(
-                token_symbol="MVT",
+                token_symbol="EVT",
                 amount=reward_amount,
-                usd_value=reward_amount * 0.50,  # Asumiendo 1 MVT = $0.50
+                usd_value=reward_amount * 0.50,  # Asumiendo 1 EVT = $0.50
                 wallet_address=wallet
             )
             
@@ -216,7 +216,7 @@ class PlayToEarnSystem:
         # En producción, esto interactuaría con el contrato real
         tx_hash = f"0x{''.join([str(hash(wallet_address + str(amount)))[:64]])}"
         
-        print(f"💰 Enviando {amount} MVT tokens a {wallet_address[:10]}...")
+        print(f"💰 Enviando {amount} EVT tokens a {wallet_address[:10]}...")
         print(f"📝 Transaction Hash: {tx_hash}")
         
         return tx_hash
@@ -229,7 +229,7 @@ class PlayToEarnSystem:
         
         print(f"🎁 Minteando NFT '{nft.name}' para {wallet_address[:10]}...")
         print(f"🏷️ Rareza: {nft.rarity.upper()}")
-        print(f"💎 Valor: {nft.value_in_tokens} MVT tokens")
+        print(f"💎 Valor: {nft.value_in_tokens} EVT tokens")
         print(f"📝 Transaction Hash: {tx_hash}")
         
         return tx_hash
@@ -333,7 +333,7 @@ if __name__ == "__main__":
             damage_dealt=2500,
             survival_time=900
         )
-        print(f"💰 Recompensa de partida: {match_reward} MVT tokens")
+        print(f"💰 Recompensa de partida: {match_reward} EVT tokens")
         
         # Generar NFT drop
         nft = p2e.generate_nft_drop(player_level=25, achievement_type="victory_royale")
@@ -341,7 +341,7 @@ if __name__ == "__main__":
             print(f"\n🎁 ¡NFT Drop!")
             print(f"Nombre: {nft.name}")
             print(f"Rareza: {nft.rarity}")
-            print(f"Valor: {nft.value_in_tokens} MVT")
+            print(f"Valor: {nft.value_in_tokens} EVT")
         
         # Simular torneo
         standings = [
@@ -354,6 +354,7 @@ if __name__ == "__main__":
         rewards = await p2e.process_tournament_rewards("tournament_001", standings)
         
         for reward in rewards:
-            print(f"✅ {reward.amount} MVT enviados a {reward.wallet_address[:10]}...")
+            print(f"✅ {reward.amount} EVT enviados a {reward.wallet_address[:10]}...")
     
     asyncio.run(demo())
+

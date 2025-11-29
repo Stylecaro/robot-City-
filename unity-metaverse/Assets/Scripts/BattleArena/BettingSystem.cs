@@ -12,9 +12,9 @@ namespace BattleArena
     {
         [Header("Entry Fees")]
         public float casualMatchFee = 0f;      // Gratis
-        public float rankedMatchFee = 10f;     // 10 MVT
-        public float tournamentFee = 50f;      // 50 MVT
-        public float highStakesFee = 100f;     // 100 MVT
+        public float rankedMatchFee = 10f;     // 10 EVT
+        public float tournamentFee = 50f;      // 50 EVT
+        public float highStakesFee = 100f;     // 100 EVT
         
         [Header("Prize Pool Distribution")]
         [Range(0f, 1f)] public float prizePoolPercentage = 0.70f;    // 70% para premios
@@ -46,7 +46,7 @@ namespace BattleArena
                 yield return true;
             }
             
-            Debug.Log($"💰 Cobrando {entryFee} MVT a {player.playerName}");
+            Debug.Log($"💰 Cobrando {entryFee} EVT a {player.playerName}");
             
             // Verificar que el jugador tenga suficientes fondos
             float playerBalance = yield return StartCoroutine(
@@ -76,7 +76,7 @@ namespace BattleArena
                 operatingFunds += operatingAmount;
                 platformFees += feeAmount;
                 
-                Debug.Log($"✅ Entrada pagada. Pool actual: {currentPrizePool} MVT");
+                Debug.Log($"✅ Entrada pagada. Pool actual: {currentPrizePool} EVT");
                 
                 // Registrar apuesta del jugador
                 player.entryFeePaid = entryFee;
@@ -95,7 +95,7 @@ namespace BattleArena
         /// </summary>
         public IEnumerator DistributePrizes(BattlePlayer[] topPlayers)
         {
-            Debug.Log($"🏆 Distribuyendo {currentPrizePool} MVT entre {topPlayers.Length} ganadores");
+            Debug.Log($"🏆 Distribuyendo {currentPrizePool} EVT entre {topPlayers.Length} ganadores");
             
             // Distribución de premios (estilo battle royale)
             float[] distribution = new float[]
@@ -120,7 +120,7 @@ namespace BattleArena
                     walletSystem.SendTokens(player.walletAddress, prize)
                 );
                 
-                Debug.Log($"💰 {player.playerName} ganó {prize} MVT (puesto #{i + 1})");
+                Debug.Log($"💰 {player.playerName} ganó {prize} EVT (puesto #{i + 1})");
                 
                 // Notificar al jugador
                 photonView.RPC("RPC_NotifyPrize", player.photonView.Owner, prize, i + 1);
@@ -133,7 +133,7 @@ namespace BattleArena
         [PunRPC]
         void RPC_NotifyPrize(float amount, int placement)
         {
-            Debug.Log($"🎉 ¡Ganaste {amount} MVT! (Puesto #{placement})");
+            Debug.Log($"🎉 ¡Ganaste {amount} EVT! (Puesto #{placement})");
             // Mostrar UI de premio
         }
         
@@ -172,3 +172,4 @@ namespace BattleArena
         }
     }
 }
+

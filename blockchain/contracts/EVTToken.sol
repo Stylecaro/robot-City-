@@ -6,11 +6,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 /**
- * @title MVTToken
+ * @title EVTToken
  * @dev Token ERC20 para recompensas de Battle Arena
- * MetaversoToken (MVT) - Token de utilidad del ecosistema
+ * EvolucionToken (EVT) - Token de utilidad del ecosistema
  */
-contract MVTToken is ERC20, Ownable, Pausable {
+contract EVTToken is ERC20, Ownable, Pausable {
     
     // Direcciones autorizadas para mintear (servidores del juego)
     mapping(address => bool) public authorizedMinters;
@@ -27,7 +27,7 @@ contract MVTToken is ERC20, Ownable, Pausable {
     event MinterRemoved(address indexed minter);
     event RewardMinted(address indexed player, uint256 amount, string reason);
     
-    constructor() ERC20("MetaversoToken", "MVT") {
+    constructor() ERC20("EvolucionToken", "EVT") {
         // Mintear suministro inicial al creador
         _mint(msg.sender, 100000000 * 10**18); // 100 millones iniciales
         

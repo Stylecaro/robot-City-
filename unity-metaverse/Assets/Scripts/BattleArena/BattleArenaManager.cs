@@ -278,7 +278,7 @@ namespace BattleArena
             TextMeshProUGUI winnerText = victoryScreen.GetComponentInChildren<TextMeshProUGUI>();
             winnerText.text = $"🏆 GANADOR: {winner.playerName}\n" +
                             $"💀 Kills: {winner.kills}\n" +
-                            $"💰 Recompensa: {CalculateReward(winner)} MVT";
+                            $"💰 Recompensa: {CalculateReward(winner)} EVT";
         }
         
         float CalculateReward(BattlePlayer player)
@@ -320,7 +320,7 @@ namespace BattleArena
         
         void ShowRewardNotification(string playerName, float amount)
         {
-            rewardDisplayText.text = $"💰 {playerName} ganó {amount} MVT tokens!";
+            rewardDisplayText.text = $"💰 {playerName} ganó {amount} EVT tokens!";
             rewardDisplayText.gameObject.SetActive(true);
             StartCoroutine(HideRewardAfterDelay(5f));
         }
@@ -346,7 +346,7 @@ namespace BattleArena
             if (paymentSuccess)
             {
                 activePlayers.Add(player);
-                Debug.Log($"✅ {player.playerName} unido a la partida (entrada: {entryFee} MVT)");
+                Debug.Log($"✅ {player.playerName} unido a la partida (entrada: {entryFee} EVT)");
             }
             else
             {
@@ -448,3 +448,4 @@ namespace BattleArena
         }
     }
 }
+

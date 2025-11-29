@@ -10,7 +10,7 @@ namespace BattleArena
     public class CryptoWalletSystem : MonoBehaviour
     {
         [Header("Contract Addresses")]
-        public string tokenContractAddress = "0x..."; // MVT Token
+        public string tokenContractAddress = "0x..."; // EVT Token
         public string nftContractAddress = "0x...";   // Battle NFT
         
         [Header("Network")]
@@ -81,7 +81,7 @@ namespace BattleArena
         /// </summary>
         public IEnumerator DeductTokens(string walletAddress, float amount)
         {
-            Debug.Log($"💸 Deduciendo {amount} MVT de {walletAddress}");
+            Debug.Log($"💸 Deduciendo {amount} EVT de {walletAddress}");
             
             #if UNITY_WEBGL && !UNITY_EDITOR
             // Transfer tokens al contrato del juego
@@ -113,7 +113,7 @@ namespace BattleArena
         /// </summary>
         public IEnumerator SendTokens(string walletAddress, float amount)
         {
-            Debug.Log($"💰 Enviando {amount} MVT a {walletAddress}");
+            Debug.Log($"💰 Enviando {amount} EVT a {walletAddress}");
             
             #if UNITY_WEBGL && !UNITY_EDITOR
             // Esta operación se hace desde el backend (servidor tiene permisos de minter)
@@ -121,7 +121,7 @@ namespace BattleArena
             yield return true;
             #else
             // Modo demo
-            Debug.Log($"✅ {amount} MVT enviados a {walletAddress}");
+            Debug.Log($"✅ {amount} EVT enviados a {walletAddress}");
             yield return true;
             #endif
         }
@@ -131,7 +131,7 @@ namespace BattleArena
         /// </summary>
         public IEnumerator TransferTokens(string from, string to, float amount)
         {
-            Debug.Log($"💸 Transfiriendo {amount} MVT de {from} a {to}");
+            Debug.Log($"💸 Transfiriendo {amount} EVT de {from} a {to}");
             
             // Esta operación requiere firma del remitente
             // En el juego, usamos el sistema de "carried tokens" en memoria
@@ -207,3 +207,4 @@ namespace BattleArena
         }
     }
 }
+

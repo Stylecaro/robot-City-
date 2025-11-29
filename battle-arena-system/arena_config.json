@@ -210,7 +210,7 @@
       }
     },
     "crypto_integration": {
-      "token": "MVT",
+      "token": "EVT",
       "blockchain": "Polygon",
       "wallet_integration": "MetaMask",
       "nft_standard": "ERC721",
@@ -370,7 +370,7 @@
     "blockchain_sdk": "Web3Unity",
     "ipfs_storage": "Pinata",
     "smart_contracts": {
-      "token_contract": "ERC20_MVT.sol",
+      "token_contract": "ERC20_EVT.sol",
       "nft_contract": "ERC721_BattleNFT.sol",
       "marketplace_contract": "NFTMarketplace.sol",
       "staking_contract": "StakingRewards.sol"
@@ -396,3 +396,4 @@
     }
   }
 }
+
