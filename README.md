@@ -1,6 +1,22 @@
-# Ciudad Robot - IA Avanzada
+<div align="center">
 
-Una plataforma integral de desarrollo, análisis, mantenimiento y creación de robots inteligentes con avatares personalizados en un entorno de ciudad virtual autónoma.
+# 🤖 Ciudad Robot - IA Avanzada
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
+[![Python Version](https://img.shields.io/badge/python-%3E%3D3.9-blue)](https://www.python.org/)
+[![Unity Version](https://img.shields.io/badge/unity-2021.3+-blueviolet)](https://unity.com/)
+[![GitHub Issues](https://img.shields.io/github/issues/Stylecaro/robot-City-)](https://github.com/Stylecaro/robot-City-/issues)
+[![GitHub Stars](https://img.shields.io/github/stars/Stylecaro/robot-City-)](https://github.com/Stylecaro/robot-City-/stargazers)
+[![CI/CD](https://github.com/Stylecaro/robot-City-/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/Stylecaro/robot-City-/actions)
+
+**Una plataforma integral de desarrollo, análisis, mantenimiento y creación de robots inteligentes con avatares personalizados en un entorno de ciudad virtual autónoma.**
+
+[🚀 Demo](#-inicio-rápido) • [📚 Docs](docs/) • [🐛 Report Bug](https://github.com/Stylecaro/robot-City-/issues) • [✨ Request Feature](https://github.com/Stylecaro/robot-City-/issues)
+
+</div>
+
+---
 
 ## 🤖 Características Principales
 
@@ -103,6 +119,16 @@ npm run dev:all
 npm run build
 ```
 
+## 🌐 Endpoints Principales
+
+| Servicio | Puerto | Endpoint | Descripción |
+|----------|--------|----------|-------------|
+| **Python WebSocket** | 8765 | `ws://localhost:8765/ws/unity` | Conexión Unity 3D |
+| **Python WebSocket** | 8765 | `ws://localhost:8765/ws/web` | Dashboard Web |
+| **Node.js API** | 8000 | `http://localhost:8000/api` | REST API |
+| **Node.js Socket.IO** | 8000 | `ws://localhost:8000` | Socket.IO |
+| **Dashboard** | 8765 | `http://localhost:8765` | Dashboard IA |
+
 ## 📖 Documentación
 
 - [Guía de Desarrollo](docs/development-guide.md)
@@ -110,13 +136,45 @@ npm run build
 - [Arquitectura IA](docs/ai-architecture.md)
 - [Sistema de Robots](docs/robot-system.md)
 
-## 🤝 Contribución
+## 🤝 Contribuir
+
+¡Las contribuciones son bienvenidas! Por favor lee [CONTRIBUTING.md](CONTRIBUTING.md) para detalles.
 
 1. Fork el repositorio
 2. Crea una rama feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -m 'Añadir nueva funcionalidad'`)
+3. Commit tus cambios (`git commit -m '✨ Añadir nueva funcionalidad'`)
 4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
 5. Abre un Pull Request
+
+Ver [contribuidores](https://github.com/Stylecaro/robot-City-/contributors) del proyecto.
+
+## 🔒 Seguridad
+
+Para reportar vulnerabilidades, lee [SECURITY.md](SECURITY.md).
+
+## 📜 Licencia
+
+MIT License - ver [LICENSE](LICENSE) para detalles.
+
+## 🙏 Agradecimientos
+
+- Three.js, Unity Technologies, TensorFlow, PyTorch
+- La comunidad open source
+
+## 📞 Contacto
+
+- **GitHub**: [@Stylecaro](https://github.com/Stylecaro)
+- **Issues**: [GitHub Issues](https://github.com/Stylecaro/robot-City-/issues)
+
+---
+
+<div align="center">
+
+⭐ **Si te gusta este proyecto, dale una estrella!** ⭐
+
+Hecho con ❤️ por el equipo de Ciudad Robot
+
+</div>
 
 ## 📝 Licencia
 
