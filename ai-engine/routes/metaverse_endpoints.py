@@ -8,6 +8,7 @@ from typing import List, Optional
 from research_system.research_manager import research_manager, ResearchType
 from simulation_system.simulation_engine import simulation_engine, SimulationType, DifficultyLevel
 from spatial_scripts.city_zones import city_manager, ZoneType
+from security_system.security_robots import security_robots_manager, RuleSeverity
 
 router = APIRouter(prefix="/api", tags=["research-simulation-zones"])
 
@@ -197,6 +198,21 @@ class PlayGameRequest(BaseModel):
     game_id: str
 
 
+class SetRolesRequest(BaseModel):
+    player_id: str
+    roles: List[str]
+
+
+class EnterBuildingRequest(BaseModel):
+    player_id: str
+    building_id: str
+
+
+class ExitBuildingRequest(BaseModel):
+    player_id: str
+    building_id: str
+
+
 @router.get("/city/zones")
 async def get_zones(zone_type: Optional[str] = None):
     """Lista zonas de la ciudad"""
@@ -265,6 +281,79 @@ async def get_zone_games(zone_id: str):
     return {
         "zone_name": zone.name,
         "games": [g.to_dict() for g in zone.mini_games]
+    }
+
+
+@router.get("/city/zones/{zone_id}/buildings")
+async def get_zone_buildings(zone_id: str):
+    """Lista edificios de una zona"""
+    zone = city_manager.get_zone(zone_id)
+    if not zone:
+        raise HTTPException(status_code=404, detail="Zone not found")
+
+    return {
+        "zone_name": zone.name,
+        "buildings": [b.to_dict() for b in zone.buildings]
+    }
+
+
+@router.post("/city/roles/set")
+async def set_player_roles(request: SetRolesRequest):
+    """Define roles del jugador para accesos a edificios"""
+    city_manager.set_player_roles(request.player_id, request.roles)
+    return {
+        "status": "roles_updated",
+        "player_id": request.player_id,
+        "roles": request.roles
+    }
+
+
+@router.post("/city/zones/{zone_id}/buildings/enter")
+async def enter_building(zone_id: str, request: EnterBuildingRequest):
+    """Intenta entrar a un edificio con control de acceso"""
+    success, message = city_manager.enter_building(
+        request.player_id,
+        zone_id,
+        request.building_id
+    )
+
+    if not success:
+        # Registrar violación de acceso
+        rule = security_robots_manager.ensure_rule(
+            "Acceso no autorizado",
+            "Intento de entrada a edificio restringido",
+            RuleSeverity.HIGH,
+            zone_id
+        )
+        security_robots_manager.report_and_enforce(
+            request.player_id,
+            rule.rule_id,
+            zone_id,
+            message
+        )
+        raise HTTPException(status_code=403, detail=message)
+
+    return {
+        "status": "entered",
+        "message": message
+    }
+
+
+@router.post("/city/zones/{zone_id}/buildings/exit")
+async def exit_building(zone_id: str, request: ExitBuildingRequest):
+    """Salir de un edificio"""
+    success, message = city_manager.exit_building(
+        request.player_id,
+        zone_id,
+        request.building_id
+    )
+
+    if not success:
+        raise HTTPException(status_code=400, detail=message)
+
+    return {
+        "status": "exited",
+        "message": message
     }
 
 

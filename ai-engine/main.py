@@ -23,6 +23,14 @@ from core.quantum_core import QuantumCore
 from utils.logger import setup_logger
 from utils.database import DatabaseManager
 
+# Routers API
+from routes.metaverse_endpoints import router as metaverse_router
+from routes.economy_endpoints import router as economy_router
+from routes.shop_endpoints import router as shop_router
+from routes.finance_endpoints import router as finance_router
+from routes.security_endpoints import router as security_router
+from routes.prison_endpoints import router as prison_router
+
 # Configuración de logging
 logger = setup_logger("ai_engine")
 
@@ -77,6 +85,14 @@ class AIEngine:
     
     def setup_routes(self):
         """Configurar rutas de la API"""
+
+        # Routers de sistemas
+        self.app.include_router(metaverse_router)
+        self.app.include_router(economy_router)
+        self.app.include_router(shop_router)
+        self.app.include_router(finance_router)
+        self.app.include_router(security_router)
+        self.app.include_router(prison_router)
         
         @self.app.get("/")
         async def root():
