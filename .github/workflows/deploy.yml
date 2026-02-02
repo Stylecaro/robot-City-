@@ -1,0 +1,93 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: staging
+      url: https://staging.ciudadrobot.dev
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm install
+        npm run build
+        
+    - name: Build Backend
+      run: |
+        cd backend
+        npm install
+        npm run build || true
+
+    - name: Deploy to Staging
+      env:
+        DEPLOY_KEY: ${{ secrets.STAGING_DEPLOY_KEY }}
+        DEPLOY_HOST: ${{ secrets.STAGING_DEPLOY_HOST }}
+      run: |
+        echo "Deploying to staging environment..."
+        # Agregar tus comandos de deploy aquí
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: production
+      url: https://ciudadrobot.dev
+    needs: [deploy-staging]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Build all services
+      run: |
+        cd backend && npm install
+        cd ../frontend && npm install && npm run build
+        cd ../ai-engine && pip install -r requirements.txt
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+          - Automated deployment from GitHub Actions
+        draft: false
+        prerelease: false
+
+    - name: Deploy to Production
+      env:
+        PROD_DEPLOY_KEY: ${{ secrets.PROD_DEPLOY_KEY }}
+        PROD_DEPLOY_HOST: ${{ secrets.PROD_DEPLOY_HOST }}
+      run: |
+        echo "Deploying to production..."
+        # Agregar tus comandos de deploy aquí
+
+    - name: Notify Deployment
+      uses: 8398a7/action-slack@v3
+      if: always()
+      with:
+        status: ${{ job.status }}
+        text: 'Production deployment ${{ job.status }}'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}

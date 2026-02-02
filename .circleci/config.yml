@@ -1,0 +1,55 @@
+version: 2.1
+
+workflows:
+  version: 2
+  build_and_deploy:
+    jobs:
+      - build
+      - test
+      - deploy:
+          requires:
+            - build
+            - test
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:18.0
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            cd backend && npm install
+            cd ../frontend && npm install
+      - run:
+          name: Build project
+          command: |
+            cd frontend && npm run build
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - .
+
+  test:
+    docker:
+      - image: cimg/node:18.0
+      - image: cimg/python:3.9
+    steps:
+      - checkout
+      - run:
+          name: Run tests
+          command: npm run test:all
+      - store_test_results:
+          path: ./test-results
+      - store_artifacts:
+          path: ./coverage
+
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run:
+          name: Deploy application
+          command: echo "Deploying..."

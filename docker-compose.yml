@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  # Base de Datos MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: ciudad-robot-db
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: robotcity
+      MONGO_INITDB_DATABASE: ciudad_robot
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - ciudad-robot-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:latest
+    container_name: ciudad-robot-cache
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - ciudad-robot-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API (Node.js)
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: ciudad-robot-backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      NODE_ENV: production
+      PORT: 8000
+      DATABASE_URL: mongodb://root:robotcity@mongodb:27017/ciudad_robot?authSource=admin
+      REDIS_URL: redis://redis:6379
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+    networks:
+      - ciudad-robot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # AI Engine (Python)
+  ai-engine:
+    build:
+      context: .
+      dockerfile: ai-engine/Dockerfile
+    container_name: ciudad-robot-ai
+    restart: always
+    ports:
+      - "8765:8765"
+    environment:
+      PYTHONUNBUFFERED: 1
+      DATABASE_URL: mongodb://root:robotcity@mongodb:27017/ciudad_robot?authSource=admin
+      REDIS_URL: redis://redis:6379
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./ai-engine:/app/ai-engine
+      - ./logs:/app/logs
+    networks:
+      - ciudad-robot-network
+
+  # Frontend (React)
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: ciudad-robot-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      REACT_APP_API_URL: http://localhost:8000
+      REACT_APP_WS_URL: ws://localhost:8000
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+      - /app/node_modules
+    networks:
+      - ciudad-robot-network
+
+volumes:
+  mongodb_data:
+  mongodb_config:
+  redis_data:
+
+networks:
+  ciudad-robot-network:
+    driver: bridge

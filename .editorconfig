@@ -1,0 +1,51 @@
+root = true
+
+# Configuración general
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Archivos JavaScript/TypeScript
+[*.{js,jsx,ts,tsx}]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+
+# Archivos Python
+[*.py]
+indent_style = space
+indent_size = 4
+max_line_length = 120
+
+# Archivos JSON
+[*.json]
+indent_style = space
+indent_size = 2
+
+# Archivos YAML
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Archivos Markdown
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = 100
+
+# Archivos Shell
+[*.sh]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+
+# Archivos Dockerfile
+[Dockerfile]
+indent_style = space
+indent_size = 2
+
+# Archivos .env
+[.env*]
+end_of_line = lf
+insert_final_newline = false

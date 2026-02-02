@@ -1,0 +1,41 @@
+version: "3"
+
+env:
+  GOOS: "{{ .Env.GOOS }}"
+  GOARCH: "{{ .Env.GOARCH }}"
+
+projects:
+  python:
+    output: "bin/python"
+    dockerfile: |
+      FROM python:3.9
+      WORKDIR /app
+      COPY ai-engine /app
+      RUN pip install -r requirements.txt
+    files:
+      - "ai-engine/**/*"
+      - "requirements.txt"
+
+  node-backend:
+    output: "bin/backend"
+    dockerfile: |
+      FROM node:18
+      WORKDIR /app
+      COPY backend /app
+      RUN npm install && npm run build
+    files:
+      - "backend/**/*"
+      - "package.json"
+
+  node-frontend:
+    output: "bin/frontend"
+    dockerfile: |
+      FROM node:18 as builder
+      WORKDIR /app
+      COPY frontend /app
+      RUN npm install && npm run build
+      
+      FROM nginx:alpine
+      COPY --from=builder /app/build /usr/share/nginx/html
+    files:
+      - "frontend/**/*"

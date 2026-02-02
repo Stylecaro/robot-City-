@@ -1,0 +1,80 @@
+# Dependabot configuration
+# Actualiza automáticamente dependencias
+
+version: 2
+updates:
+  # Node.js Dependencies
+  - package-ecosystem: "npm"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Stylecaro"
+    labels:
+      - "dependencies"
+      - "backend"
+    allow:
+      - dependency-type: "all"
+
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "04:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Stylecaro"
+    labels:
+      - "dependencies"
+      - "frontend"
+    allow:
+      - dependency-type: "all"
+
+  # Python Dependencies
+  - package-ecosystem: "pip"
+    directory: "/ai-engine"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "04:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "Stylecaro"
+    labels:
+      - "dependencies"
+      - "ai-engine"
+    allow:
+      - dependency-type: "all"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "thursday"
+      time: "04:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "Stylecaro"
+    labels:
+      - "ci-cd"
+    allow:
+      - dependency-type: "all"
+
+  # Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "friday"
+      time: "04:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "Stylecaro"
+    labels:
+      - "dependencies"
+      - "docker"

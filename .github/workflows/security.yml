@@ -1,0 +1,139 @@
+name: Security Audit
+
+on:
+  schedule:
+    # Ejecutar diariamente a las 2 AM UTC
+    - cron: '0 2 * * *'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    name: Security Audit
+
+    steps:
+    - uses: actions/checkout@v3
+
+    # Node.js Dependencies Audit
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Audit Backend Dependencies
+      run: |
+        cd backend
+        npm install
+        npm audit --audit-level=moderate || true
+
+    - name: Audit Frontend Dependencies
+      run: |
+        cd frontend
+        npm install
+        npm audit --audit-level=moderate || true
+
+    # Python Dependencies Audit
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install pip-audit
+      run: pip install pip-audit
+
+    - name: Audit AI Engine Dependencies
+      run: |
+        cd ai-engine
+        pip install -r requirements.txt
+        pip-audit --desc || true
+
+    # SAST - Semgrep
+    - name: Run Semgrep
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: >-
+          p/security-audit
+          p/owasp-top-ten
+          p/cwe-top-25
+
+    # Container Security - Trivy
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy results to GitHub Security
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    name: Dependency Check
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Run Dependabot
+      uses: dependabot/fetch-metadata@v1
+      id: metadata
+      if: github.event_name == 'pull_request'
+
+  license-check:
+    runs-on: ubuntu-latest
+    name: License Check
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Check Backend Licenses
+      run: |
+        cd backend
+        npm install
+        npm install -g license-checker
+        license-checker --onlyAllow "MIT,Apache-2.0,BSD,ISC" || true
+
+    - name: Check Frontend Licenses
+      run: |
+        cd frontend
+        npm install
+        npm install -g license-checker
+        license-checker --onlyAllow "MIT,Apache-2.0,BSD,ISC" || true
+
+  code-quality:
+    runs-on: ubuntu-latest
+    name: Code Quality
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Run ESLint
+      run: |
+        npm install -g eslint
+        cd backend && npm install && eslint . --format json > eslint-report.json || true
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Run Pylint
+      run: |
+        pip install pylint
+        cd ai-engine && python -m pylint *.py --exit-zero || true
