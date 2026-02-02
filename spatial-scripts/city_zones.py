@@ -21,6 +21,10 @@ class ZoneType(Enum):
     SPACE = "space"                # Estación espacial
     UNDERWATER = "underwater"      # Ciudad submarina
     VIRTUAL = "virtual"            # Realidad virtual dentro del metaverso
+    ENERGY = "energy"              # Plantas de energía y rendimiento
+    WORK_DISTRICT = "work_district" # Distrito de trabajo y empleos
+    MEDICAL = "medical"            # Investigación médica real
+    REAL_ESTATE = "real_estate"    # Compra/venta de propiedades
 
 
 class ZoneTier(Enum):
@@ -338,6 +342,118 @@ class CityManager:
                         min_level=100,
                         exp_reward=1000,
                         credits_reward=10000
+                    )
+                ]
+            },
+            # ENERGY & PERFORMANCE ZONE
+            {
+                "name": "Energy Power Plant",
+                "description": "Planta de energía y gestión de rendimiento",
+                "zone_type": ZoneType.ENERGY,
+                "tier": ZoneTier.MEMBER,
+                "location": (-300, 0, 0),
+                "size": 180.0,
+                "games": [
+                    MiniGame(
+                        name="Energy Management",
+                        description="Gestiona reactores de energía",
+                        game_type="puzzle",
+                        difficulty=4,
+                        min_level=15,
+                        exp_reward=250,
+                        credits_reward=2000
+                    ),
+                    MiniGame(
+                        name="Reactor Maintenance",
+                        description="Mantén los reactores operativos",
+                        game_type="puzzle",
+                        difficulty=3,
+                        exp_reward=200,
+                        credits_reward=1500
+                    )
+                ]
+            },
+            # WORK DISTRICT
+            {
+                "name": "Work & Employment Center",
+                "description": "Centro de trabajo donde ganas criptomonedas",
+                "zone_type": ZoneType.WORK_DISTRICT,
+                "tier": ZoneTier.PUBLIC,
+                "location": (300, 0, 0),
+                "size": 200.0,
+                "games": [
+                    MiniGame(
+                        name="Factory Shift",
+                        description="Trabaja en la fábrica",
+                        game_type="work",
+                        difficulty=2,
+                        exp_reward=150,
+                        credits_reward=1000
+                    ),
+                    MiniGame(
+                        name="Data Analysis",
+                        description="Analiza datos para ganar tokens",
+                        game_type="work",
+                        difficulty=4,
+                        exp_reward=300,
+                        credits_reward=2500
+                    )
+                ]
+            },
+            # MEDICAL RESEARCH ZONE
+            {
+                "name": "Medical Research Labs",
+                "description": "Investigación médica real y experimentos simulados",
+                "zone_type": ZoneType.MEDICAL,
+                "tier": ZoneTier.MEMBER,
+                "location": (-200, 0, 200),
+                "size": 170.0,
+                "games": [
+                    MiniGame(
+                        name="Medical Simulation",
+                        description="Simulaciones médicas reales",
+                        game_type="simulation",
+                        difficulty=5,
+                        min_level=20,
+                        exp_reward=400,
+                        credits_reward=3500
+                    ),
+                    MiniGame(
+                        name="Drug Development",
+                        description="Desarrollo de medicamentos",
+                        game_type="research",
+                        difficulty=5,
+                        min_level=30,
+                        exp_reward=500,
+                        credits_reward=4000
+                    )
+                ]
+            },
+            # REAL ESTATE DISTRICT
+            {
+                "name": "Real Estate Hub",
+                "description": "Compra, vende y gestiona propiedades",
+                "zone_type": ZoneType.REAL_ESTATE,
+                "tier": ZoneTier.PUBLIC,
+                "location": (150, 150, 0),
+                "size": 150.0,
+                "games": [
+                    MiniGame(
+                        name="Property Trading",
+                        description="Compra y vende propiedades",
+                        game_type="trading",
+                        difficulty=3,
+                        exp_reward=200,
+                        credits_reward=1500
+                    ),
+                    MiniGame(
+                        name="Real Estate Tycoon",
+                        description="Conviértete en magnate inmobiliario",
+                        game_type="strategy",
+                        difficulty=4,
+                        min_level=25,
+                        exp_reward=350,
+                        credits_reward=3000
                     )
                 ]
             }
