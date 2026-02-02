@@ -26,6 +26,7 @@
 - **Ciudad Virtual 3D**: Entorno inmersivo con visualización en tiempo real
 - **Analytics en Tiempo Real**: Dashboard de monitoreo y análisis de rendimiento
 - **APIs de Gestión**: Interfaces para creación y mantenimiento de bots
+- **Núcleo Cuántico**: Comunicación simulada por entrelazamiento para el centro de la ciudad
 
 ## 🏗️ Arquitectura del Sistema
 

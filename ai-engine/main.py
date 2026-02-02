@@ -19,6 +19,7 @@ from core.neural_coordinator import NeuralCoordinator
 from core.robot_manager import RobotManager
 from core.city_optimizer import CityOptimizer
 from core.decision_engine import DecisionEngine
+from core.quantum_core import QuantumCore
 from utils.logger import setup_logger
 from utils.database import DatabaseManager
 
@@ -48,6 +49,7 @@ class AIEngine:
         self.robot_manager = RobotManager()
         self.city_optimizer = CityOptimizer()
         self.decision_engine = DecisionEngine()
+        self.quantum_core = QuantumCore()
         self.db_manager = DatabaseManager()
         
         # Estado del sistema
@@ -120,6 +122,44 @@ class AIEngine:
             result = await self.city_optimizer.optimize()
             await self.notify_clients("city_optimized", result)
             return result
+
+        @self.app.get("/quantum/nodes")
+        async def get_quantum_nodes():
+            """Listar nodos cuánticos registrados"""
+            return {
+                "central_city_node_id": self.quantum_core.central_city_node_id,
+                "nodes": self.quantum_core.list_nodes()
+            }
+
+        @self.app.post("/quantum/nodes/register")
+        async def register_quantum_node(payload: dict):
+            """Registrar un nodo cuántico nuevo"""
+            name = payload.get("name", "Quantum Node")
+            location = payload.get("location", "unknown")
+            node = self.quantum_core.register_node(name=name, location=location)
+            return node.to_dict()
+
+        @self.app.get("/quantum/channels")
+        async def get_quantum_channels():
+            """Listar canales de entrelazamiento"""
+            return self.quantum_core.list_channels()
+
+        @self.app.post("/quantum/entangle")
+        async def create_entangled_channel(payload: dict):
+            """Crear un canal de entrelazamiento"""
+            node_a = payload.get("node_a")
+            node_b = payload.get("node_b")
+            fidelity = float(payload.get("fidelity", 0.98))
+            channel = self.quantum_core.create_entangled_channel(node_a, node_b, fidelity)
+            return channel.to_dict()
+
+        @self.app.post("/quantum/transmit")
+        async def transmit_quantum_message(payload: dict):
+            """Transmitir mensaje por canal cuántico"""
+            channel_id = payload.get("channel_id")
+            message = payload.get("message", "")
+            noise = float(payload.get("noise", 0.01))
+            return self.quantum_core.transmit(channel_id, message, noise)
         
         @self.app.websocket("/ws")
         async def websocket_endpoint(websocket: WebSocket):
@@ -175,6 +215,16 @@ class AIEngine:
             await websocket.send_json({
                 "type": "neural_analysis_result",
                 "data": analysis
+            })
+
+        elif message_type == "quantum_message":
+            channel_id = payload.get("channel_id")
+            message = payload.get("message", "")
+            noise = float(payload.get("noise", 0.01))
+            result = self.quantum_core.transmit(channel_id, message, noise)
+            await websocket.send_json({
+                "type": "quantum_message_result",
+                "data": result
             })
     
     async def notify_clients(self, event_type: str, data: Any):
