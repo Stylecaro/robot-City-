@@ -19,6 +19,7 @@ import os
 sys.path.append(os.path.dirname(__file__))
 
 from ai_engine.core.ai_coordinator import ai_coordinator, CityMetrics
+from ai_engine.core.quantum_core import QuantumCore
 from ai_engine.core.predictive_analytics import analytics_engine
 from robot_system.robot_ai import RobotAI, Position, Task, TaskPriority, create_robot
 
@@ -45,6 +46,7 @@ class MetaversoServer:
         # Estado del sistema
         self.system_active = False
         self.robots: Dict[str, RobotAI] = {}
+        self.quantum_core = QuantumCore()
         
         # Configurar rutas
         self._setup_routes()
@@ -92,6 +94,44 @@ class MetaversoServer:
             
             analysis = analytics_engine.analyze_city(city_data)
             return analysis
+
+        @self.app.get("/api/quantum/nodes")
+        async def get_quantum_nodes():
+            """Lista de nodos cuánticos"""
+            return {
+                "central_city_node_id": self.quantum_core.central_city_node_id,
+                "nodes": self.quantum_core.list_nodes()
+            }
+
+        @self.app.post("/api/quantum/nodes/register")
+        async def register_quantum_node(payload: Dict):
+            """Registrar un nodo cuántico"""
+            name = payload.get("name", "Quantum Node")
+            location = payload.get("location", "unknown")
+            node = self.quantum_core.register_node(name=name, location=location)
+            return node.to_dict()
+
+        @self.app.get("/api/quantum/channels")
+        async def get_quantum_channels():
+            """Lista de canales de entrelazamiento"""
+            return self.quantum_core.list_channels()
+
+        @self.app.post("/api/quantum/entangle")
+        async def create_quantum_channel(payload: Dict):
+            """Crear canal de entrelazamiento"""
+            node_a = payload.get("node_a")
+            node_b = payload.get("node_b")
+            fidelity = float(payload.get("fidelity", 0.98))
+            channel = self.quantum_core.create_entangled_channel(node_a, node_b, fidelity)
+            return channel.to_dict()
+
+        @self.app.post("/api/quantum/transmit")
+        async def transmit_quantum_message(payload: Dict):
+            """Transmitir mensaje por canal cuántico"""
+            channel_id = payload.get("channel_id")
+            message = payload.get("message", "")
+            noise = float(payload.get("noise", 0.01))
+            return self.quantum_core.transmit(channel_id, message, noise)
         
         @self.app.get("/api/alerts")
         async def get_alerts():
@@ -161,6 +201,16 @@ class MetaversoServer:
             # Unity solicita comando de IA
             response = await self._get_ai_command()
             await websocket.send_json(response)
+
+        elif msg_type == "quantum_message":
+            channel_id = data.get("channel_id")
+            message = data.get("message", "")
+            noise = float(data.get("noise", 0.01))
+            result = self.quantum_core.transmit(channel_id, message, noise)
+            await websocket.send_json({
+                "type": "quantum_message_result",
+                "data": result
+            })
     
     async def _handle_web_message(self, data: Dict, websocket: WebSocket):
         """Procesa mensajes del dashboard web"""
@@ -180,6 +230,26 @@ class MetaversoServer:
             robot_id = data.get("robot_id")
             task_data = data.get("task")
             await self._assign_task(robot_id, task_data)
+
+        elif msg_type == "quantum_entangle":
+            node_a = data.get("node_a")
+            node_b = data.get("node_b")
+            fidelity = float(data.get("fidelity", 0.98))
+            channel = self.quantum_core.create_entangled_channel(node_a, node_b, fidelity)
+            await websocket.send_json({
+                "type": "quantum_entangle_result",
+                "data": channel.to_dict()
+            })
+
+        elif msg_type == "quantum_message":
+            channel_id = data.get("channel_id")
+            message = data.get("message", "")
+            noise = float(data.get("noise", 0.01))
+            result = self.quantum_core.transmit(channel_id, message, noise)
+            await websocket.send_json({
+                "type": "quantum_message_result",
+                "data": result
+            })
     
     async def _sync_unity_to_ai(self, data: Dict):
         """Sincroniza datos de Unity con AI Coordinator"""
