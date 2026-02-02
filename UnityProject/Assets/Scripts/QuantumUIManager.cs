@@ -1,27 +1,72 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
 
 /// <summary>
-/// QuantumUIManager - Panel UI para crear canales y enviar mensajes cuánticos
+/// QuantumUIManager - Panel UI avanzado para control cuántico
+/// Auto-lista nodos, canales, presets y validación
 /// </summary>
 public class QuantumUIManager : MonoBehaviour
 {
-    [Header("UI References (opcional, auto-build si están vacías)")]
+    [Header("UI References")]
     public Canvas rootCanvas;
-    public InputField nodeAInput;
-    public InputField nodeBInput;
-    public InputField channelInput;
+    public Dropdown nodeADropdown;
+    public Dropdown nodeBDropdown;
+    public Dropdown channelDropdown;
+    public Dropdown presetDropdown;
     public InputField messageInput;
     public Slider fidelitySlider;
     public Slider noiseSlider;
     public Button entangleButton;
     public Button sendButton;
+    public Button refreshButton;
     public Text statusText;
+    public Text nodeCountText;
+    public Text channelCountText;
 
     [Header("Configuración")]
     public bool autoBuildUI = true;
-    public Vector2 panelSize = new Vector2(420, 260);
+    public Vector2 panelSize = new Vector2(500, 380);
     public Vector2 panelPosition = new Vector2(20, 200);
+    public float autoRefreshInterval = 5f;
+
+    private List<QuantumNode> availableNodes = new List<QuantumNode>();
+    private List<QuantumChannel> availableChannels = new List<QuantumChannel>();
+    private float lastRefreshTime = 0f;
+
+    [System.Serializable]
+    public class QuantumNode
+    {
+        public string node_id;
+        public string name;
+        public string location;
+        public string status;
+    }
+
+    [System.Serializable]
+    public class QuantumChannel
+    {
+        public string channel_id;
+        public string node_a;
+        public string node_b;
+        public float fidelity;
+        public bool active;
+    }
+
+    [System.Serializable]
+    public class NodesResponse
+    {
+        public string central_city_node_id;
+        public List<QuantumNode> nodes;
+    }
+
+    [System.Serializable]
+    public class ChannelsResponse
+    {
+        public List<QuantumChannel> channels;
+    }
 
     private void Start()
     {
@@ -31,6 +76,101 @@ public class QuantumUIManager : MonoBehaviour
         }
 
         BindUIEvents();
+        RefreshNodesList();
+        RefreshChannelsList();
+
+        // Auto-refresh cada 5 segundos
+        InvokeRepeating(nameof(AutoRefresh), autoRefreshInterval, autoRefreshInterval);
+    }
+
+    private void AutoRefresh()
+    {
+        if (Time.time - lastRefreshTime > autoRefreshInterval)
+        {
+            RefreshNodesList();
+            RefreshChannelsList();
+        }
+    }
+
+    private async void RefreshNodesList()
+    {
+        try
+        {
+            using (System.Net.Http.HttpClient client = new System.Net.Http.HttpClient())
+            {
+                var response = await client.GetAsync("http://localhost:8765/api/quantum/nodes");
+                string json = await response.Content.ReadAsStringAsync();
+                var nodesData = JsonConvert.DeserializeObject<NodesResponse>(json);
+
+                availableNodes = nodesData.nodes;
+                UpdateNodeDropdowns();
+                lastRefreshTime = Time.time;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            SetStatus($"Error cargando nodos: {ex.Message}");
+        }
+    }
+
+    private async void RefreshChannelsList()
+    {
+        try
+        {
+            using (System.Net.Http.HttpClient client = new System.Net.Http.HttpClient())
+            {
+                var response = await client.GetAsync("http://localhost:8765/api/quantum/channels");
+                string json = await response.Content.ReadAsStringAsync();
+                var channelsData = JsonConvert.DeserializeObject<ChannelsResponse>(json);
+
+                availableChannels = channelsData.channels ?? new List<QuantumChannel>();
+                UpdateChannelDropdown();
+            }
+        }
+        catch (System.Exception ex)
+        {
+            SetStatus($"Error cargando canales: {ex.Message}");
+        }
+    }
+
+    private void UpdateNodeDropdowns()
+    {
+        if (nodeADropdown != null)
+        {
+            nodeADropdown.ClearOptions();
+            List<string> options = availableNodes.Select(n => $"{n.name} ({n.node_id.Substring(0, 8)})").ToList();
+            nodeADropdown.AddOptions(options);
+        }
+
+        if (nodeBDropdown != null)
+        {
+            nodeBDropdown.ClearOptions();
+            List<string> options = availableNodes.Select(n => $"{n.name} ({n.node_id.Substring(0, 8)})").ToList();
+            nodeBDropdown.AddOptions(options);
+        }
+
+        if (nodeCountText != null)
+        {
+            nodeCountText.text = $"Nodos: {availableNodes.Count}";
+        }
+    }
+
+    private void UpdateChannelDropdown()
+    {
+        if (channelDropdown != null)
+        {
+            channelDropdown.ClearOptions();
+            List<string> options = availableChannels
+                .Where(c => c.active)
+                .Select(c => $"Fidelity {c.fidelity:0.000} ({c.channel_id.Substring(0, 8)})")
+                .ToList();
+            channelDropdown.AddOptions(options);
+        }
+
+        if (channelCountText != null)
+        {
+            channelCountText.text = $"Canales: {availableChannels.Count(c => c.active)}";
+        }
     }
 
     private void EnsureUI()
@@ -47,20 +187,83 @@ public class QuantumUIManager : MonoBehaviour
         if (statusText == null)
         {
             GameObject panel = CreatePanel(rootCanvas.transform, panelSize, panelPosition);
-            CreateLabel(panel.transform, "Quantum UI", new Vector2(10, -10), 18, FontStyle.Bold);
+            CreateLabel(panel.transform, "⚛️ Quantum Control Panel", new Vector2(10, -10), 16, FontStyle.Bold);
 
-            nodeAInput = CreateInput(panel.transform, "Node A ID", new Vector2(10, -40));
-            nodeBInput = CreateInput(panel.transform, "Node B ID", new Vector2(10, -80));
-            channelInput = CreateInput(panel.transform, "Channel ID", new Vector2(10, -140));
-            messageInput = CreateInput(panel.transform, "Message", new Vector2(10, -180));
+            // Row 1: Nodos
+            CreateLabel(panel.transform, "Node A:", new Vector2(10, -40), 12, FontStyle.Normal);
+            nodeADropdown = CreateDropdown(panel.transform, new Vector2(10, -60), 180);
 
-            fidelitySlider = CreateSlider(panel.transform, "Fidelity", new Vector2(10, -110), 0.5f, 1f, 0.98f);
-            noiseSlider = CreateSlider(panel.transform, "Noise", new Vector2(220, -110), 0f, 0.2f, 0.01f);
+            CreateLabel(panel.transform, "Node B:", new Vector2(210, -40), 12, FontStyle.Normal);
+            nodeBDropdown = CreateDropdown(panel.transform, new Vector2(210, -60), 180);
 
-            entangleButton = CreateButton(panel.transform, "Entangle", new Vector2(10, -220), new Vector2(180, 30));
-            sendButton = CreateButton(panel.transform, "Send", new Vector2(200, -220), new Vector2(180, 30));
+            // Row 2: Fidelidad y Ruido
+            fidelitySlider = CreateSlider(panel.transform, "Fidelity", new Vector2(10, -90), 0.5f, 1f, 0.98f);
+            noiseSlider = CreateSlider(panel.transform, "Noise", new Vector2(250, -90), 0f, 0.2f, 0.01f);
 
-            statusText = CreateLabel(panel.transform, "Listo", new Vector2(10, -255), 12, FontStyle.Normal);
+            // Row 3: Presets
+            CreateLabel(panel.transform, "Preset:", new Vector2(10, -140), 12, FontStyle.Normal);
+            presetDropdown = CreateDropdown(panel.transform, new Vector2(10, -160), 380);
+            SetupPresetDropdown();
+
+            // Row 4: Canal y Mensaje
+            CreateLabel(panel.transform, "Channel:", new Vector2(10, -200), 12, FontStyle.Normal);
+            channelDropdown = CreateDropdown(panel.transform, new Vector2(10, -220), 220);
+
+            CreateLabel(panel.transform, "Message:", new Vector2(240, -200), 12, FontStyle.Normal);
+            messageInput = CreateInput(panel.transform, "Message text...", new Vector2(240, -220));
+
+            // Row 5: Botones
+            entangleButton = CreateButton(panel.transform, "Entangle", new Vector2(10, -270), new Vector2(140, 30));
+            sendButton = CreateButton(panel.transform, "Send", new Vector2(160, -270), new Vector2(140, 30));
+            refreshButton = CreateButton(panel.transform, "Refresh", new Vector2(310, -270), new Vector2(80, 30));
+
+            // Row 6: Info
+            nodeCountText = CreateLabel(panel.transform, "Nodos: 0", new Vector2(10, -310), 11, FontStyle.Normal);
+            channelCountText = CreateLabel(panel.transform, "Canales: 0", new Vector2(200, -310), 11, FontStyle.Normal);
+
+            // Status
+            statusText = CreateLabel(panel.transform, "Inicializando...", new Vector2(10, -330), 10, FontStyle.Italic);
+        }
+    }
+
+    private void SetupPresetDropdown()
+    {
+        if (presetDropdown == null)
+            return;
+
+        presetDropdown.ClearOptions();
+        List<string> presets = new List<string>
+        {
+            "Custom",
+            "High Fidelity (0.99 - 0.001 noise)",
+            "Standard (0.98 - 0.01 noise)",
+            "Noisy Channel (0.95 - 0.05 noise)",
+            "Very Noisy (0.90 - 0.1 noise)"
+        };
+        presetDropdown.AddOptions(presets);
+        presetDropdown.onValueChanged.AddListener(OnPresetSelected);
+    }
+
+    private void OnPresetSelected(int index)
+    {
+        switch (index)
+        {
+            case 1: // High Fidelity
+                if (fidelitySlider != null) fidelitySlider.value = 0.99f;
+                if (noiseSlider != null) noiseSlider.value = 0.001f;
+                break;
+            case 2: // Standard
+                if (fidelitySlider != null) fidelitySlider.value = 0.98f;
+                if (noiseSlider != null) noiseSlider.value = 0.01f;
+                break;
+            case 3: // Noisy
+                if (fidelitySlider != null) fidelitySlider.value = 0.95f;
+                if (noiseSlider != null) noiseSlider.value = 0.05f;
+                break;
+            case 4: // Very Noisy
+                if (fidelitySlider != null) fidelitySlider.value = 0.90f;
+                if (noiseSlider != null) noiseSlider.value = 0.1f;
+                break;
         }
     }
 
@@ -77,50 +280,86 @@ public class QuantumUIManager : MonoBehaviour
             sendButton.onClick.RemoveAllListeners();
             sendButton.onClick.AddListener(OnSendClicked);
         }
+
+        if (refreshButton != null)
+        {
+            refreshButton.onClick.RemoveAllListeners();
+            refreshButton.onClick.AddListener(() =>
+            {
+                RefreshNodesList();
+                RefreshChannelsList();
+                SetStatus("Listas actualizadas");
+            });
+        }
     }
 
     private async void OnEntangleClicked()
     {
-        if (NetworkManager.Instance == null)
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.isConnected)
         {
-            SetStatus("NetworkManager no encontrado");
+            SetStatus("❌ Servidor no conectado");
             return;
         }
 
-        string nodeA = nodeAInput != null ? nodeAInput.text : string.Empty;
-        string nodeB = nodeBInput != null ? nodeBInput.text : string.Empty;
+        if (nodeADropdown == null || nodeBDropdown == null || availableNodes.Count == 0)
+        {
+            SetStatus("❌ Nodos no disponibles");
+            return;
+        }
+
+        int nodeAIdx = nodeADropdown.value;
+        int nodeBIdx = nodeBDropdown.value;
+
+        if (nodeAIdx < 0 || nodeAIdx >= availableNodes.Count || nodeBIdx < 0 || nodeBIdx >= availableNodes.Count)
+        {
+            SetStatus("❌ Selecciona nodos válidos");
+            return;
+        }
+
+        string nodeA = availableNodes[nodeAIdx].node_id;
+        string nodeB = availableNodes[nodeBIdx].node_id;
         float fidelity = fidelitySlider != null ? fidelitySlider.value : 0.98f;
 
-        if (string.IsNullOrEmpty(nodeA) || string.IsNullOrEmpty(nodeB))
+        if (nodeA == nodeB)
         {
-            SetStatus("Node A y Node B son obligatorios");
+            SetStatus("❌ Los nodos no pueden ser iguales");
             return;
         }
 
         await NetworkManager.Instance.CreateQuantumChannel(nodeA, nodeB, fidelity);
-        SetStatus("Solicitud de entrelazamiento enviada");
+        SetStatus($"✓ Entrelazamiento solicitado (Fidelity: {fidelity:0.000})");
     }
 
     private async void OnSendClicked()
     {
-        if (NetworkManager.Instance == null)
+        if (NetworkManager.Instance == null || !NetworkManager.Instance.isConnected)
         {
-            SetStatus("NetworkManager no encontrado");
+            SetStatus("❌ Servidor no conectado");
             return;
         }
 
-        string channelId = channelInput != null ? channelInput.text : string.Empty;
-        string message = messageInput != null ? messageInput.text : string.Empty;
+        if (channelDropdown == null || availableChannels.Count == 0)
+        {
+            SetStatus("❌ Canales no disponibles");
+            return;
+        }
+
+        int channelIdx = channelDropdown.value;
+        if (channelIdx < 0 || channelIdx >= availableChannels.Count)
+        {
+            SetStatus("❌ Selecciona un canal válido");
+            return;
+        }
+
+        string channelId = availableChannels[channelIdx].channel_id;
+        string message = messageInput != null ? messageInput.text : "test";
         float noise = noiseSlider != null ? noiseSlider.value : 0.01f;
 
-        if (string.IsNullOrEmpty(channelId))
-        {
-            SetStatus("Channel ID es obligatorio");
-            return;
-        }
+        if (string.IsNullOrEmpty(message))
+            message = "quantum_message";
 
         await NetworkManager.Instance.SendQuantumMessage(channelId, message, noise);
-        SetStatus("Mensaje cuántico enviado");
+        SetStatus($"✓ Mensaje enviado (BER: {noise:0.00000})");
     }
 
     private void SetStatus(string text)
@@ -252,5 +491,58 @@ public class QuantumUIManager : MonoBehaviour
         labelRect.sizeDelta = size;
 
         return button;
+    }
+
+    private void SetStatus(string message)
+    {
+        if (statusText != null)
+        {
+            statusText.text = message;
+            Debug.Log($"[QuantumUI] {message}");
+        }
+    }
+
+    private Dropdown CreateDropdown(Transform parent, string label, Vector2 pos, Vector2 size)
+    {
+        // Container para label + dropdown
+        GameObject container = new GameObject($"Dropdown_{label}");
+        container.transform.SetParent(parent, false);
+        RectTransform containerRect = container.AddComponent<RectTransform>();
+        containerRect.sizeDelta = size;
+        containerRect.anchorMin = new Vector2(0, 1);
+        containerRect.anchorMax = new Vector2(0, 1);
+        containerRect.pivot = new Vector2(0, 1);
+        containerRect.anchoredPosition = pos;
+
+        // Background
+        Image bgImage = container.AddComponent<Image>();
+        bgImage.color = new Color(0.15f, 0.15f, 0.25f, 0.8f);
+
+        // Label
+        Text labelText = CreateLabel(container.transform, label, Vector2.zero, 12, FontStyle.Bold);
+        RectTransform labelRect = labelText.GetComponent<RectTransform>();
+        labelRect.offsetMin = new Vector2(5, -size.y + 5);
+        labelRect.offsetMax = new Vector2(size.x - 5, -5);
+        labelText.alignment = TextAnchor.MiddleLeft;
+
+        // Dropdown
+        GameObject dropdownObj = new GameObject("Dropdown");
+        dropdownObj.transform.SetParent(container.transform, false);
+        RectTransform dropRect = dropdownObj.AddComponent<RectTransform>();
+        dropRect.offsetMin = Vector2.zero;
+        dropRect.offsetMax = Vector2.zero;
+
+        Image dropImage = dropdownObj.AddComponent<Image>();
+        dropImage.color = new Color(0.1f, 0.1f, 0.2f, 0.9f);
+
+        Dropdown dropdown = dropdownObj.AddComponent<Dropdown>();
+
+        // Setup basic options
+        dropdown.options = new List<Dropdown.OptionData>
+        {
+            new Dropdown.OptionData("Cargando..."),
+        };
+
+        return dropdown;
     }
 }
