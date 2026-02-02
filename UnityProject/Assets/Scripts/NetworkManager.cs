@@ -14,7 +14,7 @@ using Newtonsoft.Json;
 public class NetworkManager : MonoBehaviour
 {
     [Header("Configuración de Conexión")]
-    public string serverUrl = "ws://localhost:8765";
+    public string serverUrl = "ws://localhost:8765/ws/unity";
     public float reconnectDelay = 5f;
     public bool autoConnect = true;
 
@@ -222,6 +222,7 @@ public class NetworkManager : MonoBehaviour
             if (data.ContainsKey("type"))
             {
                 string messageType = data["type"].ToString();
+                Dictionary<string, object> payload = ExtractPayload(data);
 
                 switch (messageType)
                 {
@@ -233,6 +234,12 @@ public class NetworkManager : MonoBehaviour
                         break;
                     case "ai_command":
                         HandleAICommand(data);
+                        break;
+                    case "quantum_entangle_result":
+                        HandleQuantumEntangleResult(payload);
+                        break;
+                    case "quantum_message_result":
+                        HandleQuantumMessageResult(payload);
                         break;
                     case "ping":
                         HandlePing();
@@ -273,10 +280,65 @@ public class NetworkManager : MonoBehaviour
         Debug.Log($"🤖 Comando IA: {data["command"]}");
     }
 
+    private void HandleQuantumEntangleResult(Dictionary<string, object> data)
+    {
+        if (CityManager.Instance != null)
+        {
+            CityManager.Instance.HandleQuantumEntangleResult(data);
+        }
+    }
+
+    private void HandleQuantumMessageResult(Dictionary<string, object> data)
+    {
+        if (CityManager.Instance != null)
+        {
+            CityManager.Instance.HandleQuantumMessageResult(data);
+        }
+    }
+
     private async void HandlePing()
     {
         lastPingTime = Time.time;
         await SendJsonAsync(new { type = "pong", timestamp = DateTime.Now.ToString("o") });
+    }
+
+    private Dictionary<string, object> ExtractPayload(Dictionary<string, object> data)
+    {
+        if (data == null || !data.ContainsKey("data") || data["data"] == null)
+        {
+            return new Dictionary<string, object>();
+        }
+
+        try
+        {
+            return JsonConvert.DeserializeObject<Dictionary<string, object>>(data["data"].ToString());
+        }
+        catch
+        {
+            return new Dictionary<string, object>();
+        }
+    }
+
+    public async Task CreateQuantumChannel(string nodeA, string nodeB, float fidelity = 0.98f)
+    {
+        await SendJsonAsync(new
+        {
+            type = "quantum_entangle",
+            node_a = nodeA,
+            node_b = nodeB,
+            fidelity = fidelity
+        });
+    }
+
+    public async Task SendQuantumMessage(string channelId, string message, float noise = 0.01f)
+    {
+        await SendJsonAsync(new
+        {
+            type = "quantum_message",
+            channel_id = channelId,
+            message = message,
+            noise = noise
+        });
     }
 
     private void OnDestroy()

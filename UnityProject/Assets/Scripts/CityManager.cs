@@ -29,6 +29,14 @@ public class CityManager : MonoBehaviour
     public float energyConsumption = 0f;
 
     // Gestión de robots
+    [Header("Núcleo Cuántico")]
+    public bool showQuantumOverlay = true;
+    public string centralQuantumNodeId = "";
+    public string lastQuantumChannelId = "";
+    public string lastQuantumMessage = "";
+    public float lastQuantumBitErrorRate = 0f;
+    public float lastQuantumFidelity = 0f;
+    public string lastQuantumTarget = "";
     private Dictionary<string, RobotController> robots = new Dictionary<string, RobotController>();
     private List<GameObject> buildings = new List<GameObject>();
     private float lastSpawnTime = 0f;
@@ -74,6 +82,7 @@ public class CityManager : MonoBehaviour
                 lastSpawnTime = Time.time;
             }
         }
+        UpdateQuantumVisuals();
     }
 
     /// <summary>
@@ -99,6 +108,7 @@ public class CityManager : MonoBehaviour
         CreateBuilding("Research Lab", new Vector3(40, 0, -40), Color.green, 25f, 80f);
         CreateBuilding("Security HQ", new Vector3(-40, 0, 40), Color.red, 35f, 50f);
         CreateBuilding("AI Core", new Vector3(40, 0, 40), Color.yellow, 40f, 100f);
+        CreateQuantumCore(new Vector3(0, 0, 0));
 
         // Crear estaciones de carga
         for (int i = 0; i < 4; i++)
@@ -417,6 +427,39 @@ public class CityManager : MonoBehaviour
             energyConsumption = float.Parse(data["energy_consumption"].ToString());
     }
 
+    public void HandleQuantumEntangleResult(Dictionary<string, object> data)
+    {
+        if (data == null)
+            return;
+
+        if (data.ContainsKey("channel_id"))
+            lastQuantumChannelId = data["channel_id"].ToString();
+
+        if (data.ContainsKey("fidelity"))
+            lastQuantumFidelity = float.Parse(data["fidelity"].ToString());
+    }
+
+    public void HandleQuantumMessageResult(Dictionary<string, object> data)
+    {
+        if (data == null)
+            return;
+
+        if (data.ContainsKey("channel_id"))
+            lastQuantumChannelId = data["channel_id"].ToString();
+
+        if (data.ContainsKey("received"))
+            lastQuantumMessage = data["received"].ToString();
+
+        if (data.ContainsKey("bit_error_rate"))
+            lastQuantumBitErrorRate = float.Parse(data["bit_error_rate"].ToString());
+
+        if (data.ContainsKey("fidelity"))
+            lastQuantumFidelity = float.Parse(data["fidelity"].ToString());
+
+        if (data.ContainsKey("target"))
+            lastQuantumTarget = data["target"].ToString();
+    }
+
     /// <summary>
     /// Sincroniza con sistema de IA
     /// </summary>
@@ -481,6 +524,61 @@ public class CityManager : MonoBehaviour
                     Gizmos.DrawLine(robot.transform.position, robot.transform.position + Vector3.up * 5f);
                 }
             }
+        }
+    }
+
+    private void OnGUI()
+    {
+        if (!showQuantumOverlay)
+            return;
+
+        GUI.color = Color.white;
+        GUILayout.BeginArea(new Rect(20, 20, 360, 160), "", "box");
+        GUILayout.Label("⚛️ Núcleo Cuántico");
+        GUILayout.Label($"Canal: {(string.IsNullOrEmpty(lastQuantumChannelId) ? "-" : lastQuantumChannelId)}");
+        GUILayout.Label($"Fidelidad: {lastQuantumFidelity:0.000}");
+        GUILayout.Label($"BER: {lastQuantumBitErrorRate:0.000000}");
+        GUILayout.Label($"Destino: {(string.IsNullOrEmpty(lastQuantumTarget) ? "central_city" : lastQuantumTarget)}");
+        GUILayout.Label($"Mensaje: {(string.IsNullOrEmpty(lastQuantumMessage) ? "-" : lastQuantumMessage)}");
+        GUILayout.EndArea();
+    }
+
+    private GameObject quantumCoreObject;
+
+    private void CreateQuantumCore(Vector3 position)
+    {
+        quantumCoreObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        quantumCoreObject.name = "Quantum Core";
+        quantumCoreObject.transform.parent = buildingsParent;
+        quantumCoreObject.transform.position = position + Vector3.up * 6f;
+        quantumCoreObject.transform.localScale = new Vector3(12f, 12f, 12f);
+
+        Renderer renderer = quantumCoreObject.GetComponent<Renderer>();
+        renderer.material = new Material(Shader.Find("Standard"));
+        renderer.material.color = new Color(0.35f, 0.0f, 0.9f);
+        renderer.material.EnableKeyword("_EMISSION");
+        renderer.material.SetColor("_EmissionColor", new Color(0.4f, 0.2f, 1f));
+
+        Light light = quantumCoreObject.AddComponent<Light>();
+        light.color = new Color(0.6f, 0.4f, 1f);
+        light.intensity = 3f;
+        light.range = 25f;
+    }
+
+    private void UpdateQuantumVisuals()
+    {
+        if (quantumCoreObject == null)
+            return;
+
+        float pulse = 1.5f + Mathf.Sin(Time.time * 2f) * 0.5f;
+        quantumCoreObject.transform.localScale = new Vector3(12f, 12f, 12f) * pulse;
+
+        Renderer renderer = quantumCoreObject.GetComponent<Renderer>();
+        if (renderer != null)
+        {
+            float intensity = Mathf.Clamp01(lastQuantumFidelity > 0 ? lastQuantumFidelity : 0.5f);
+            Color glow = Color.Lerp(new Color(0.4f, 0.2f, 1f), new Color(0.2f, 1f, 1f), intensity);
+            renderer.material.SetColor("_EmissionColor", glow * (0.7f + intensity));
         }
     }
 }
