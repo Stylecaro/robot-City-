@@ -4,7 +4,7 @@
   "description": "Frontend 3D para Ciudad Robot Virtual",
   "private": true,
   "dependencies": {
-    "@react-three/fiber": "^8.15.12",
+    "@react-three/fiber": "^9.5.0",
     "@react-three/drei": "^9.92.2",
     "@react-three/cannon": "^6.6.0",
     "@react-three/postprocessing": "^2.15.11",
