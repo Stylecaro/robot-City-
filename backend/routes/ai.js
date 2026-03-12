@@ -7,6 +7,7 @@ const router = express.Router();
 const { body, param, query, validationResult } = require('express-validator');
 const logger = require('../utils/logger');
 const axios = require('axios');
+const neuronarSystem = require('../utils/neuronar');
 
 // Configuración del motor de IA
 const AI_ENGINE_URL = process.env.AI_ENGINE_URL || 'http://localhost:5000';
@@ -47,7 +48,8 @@ let aiData = {
     processing_power: 0.75, // utilización
     memory_usage: 0.68,
     accuracy_trend: 'improving'
-  }
+  },
+  neuronar: neuronarSystem.getOverview()
 };
 
 // Middleware de validación
@@ -63,9 +65,33 @@ const validateTraining = [
     .withMessage('Tipo de red neuronal inválido')
 ];
 
+const validateNeuronarInference = [
+  body('task_type').isIn(['diagnostic', 'routing', 'threat-assessment', 'resource-allocation'])
+    .withMessage('task_type invalido para NEURONAR'),
+  body('input').isObject().withMessage('input debe ser un objeto')
+];
+
+const validateQuantumTx = [
+  body('from').isString().isLength({ min: 2 }).withMessage('from es requerido'),
+  body('to').isString().isLength({ min: 2 }).withMessage('to es requerido'),
+  body('payload').optional().isObject().withMessage('payload debe ser un objeto'),
+  body('energy_cost').optional().isFloat({ min: 0.01, max: 50 }).withMessage('energy_cost fuera de rango')
+];
+
+const validateWeb3Identity = [
+  body('alias').isString().isLength({ min: 2, max: 40 }).withMessage('alias invalido'),
+  body('address').optional().isString().withMessage('address debe ser texto')
+];
+
+const validateWeb3Anchor = [
+  body('asset_id').isString().isLength({ min: 2 }).withMessage('asset_id requerido'),
+  body('metadata').optional().isObject().withMessage('metadata debe ser un objeto')
+];
+
 // GET /api/ai - Obtener estado general del sistema de IA
 router.get('/', (req, res) => {
   try {
+    aiData.neuronar = neuronarSystem.getOverview();
     res.json({
       success: true,
       data: aiData,
@@ -80,6 +106,253 @@ router.get('/', (req, res) => {
       error: 'Error interno del servidor',
       message: error.message
     });
+  }
+});
+
+// GET /api/ai/neuronar - Estado completo de NEURONAR
+router.get('/neuronar', (req, res) => {
+  try {
+    const overview = neuronarSystem.getOverview();
+    res.json({
+      success: true,
+      data: overview,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Error obteniendo estado de NEURONAR:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error obteniendo estado de NEURONAR',
+      message: error.message
+    });
+  }
+});
+
+// GET /api/ai/neuronar/docs - Documentacion rapida de endpoints NEURONAR
+router.get('/neuronar/docs', (req, res) => {
+  try {
+    const base = '/api/ai/neuronar';
+    res.json({
+      success: true,
+      data: {
+        name: 'NEURONAR API',
+        version: '1.0.0',
+        sections: {
+          core: [
+            { method: 'GET', path: `${base}` },
+            { method: 'POST', path: `${base}/boot` },
+            { method: 'GET', path: `${base}/quantum-core` },
+            { method: 'POST', path: `${base}/quantum-core/calibrate` },
+            { method: 'POST', path: `${base}/inference` }
+          ],
+          quantum_chain: [
+            { method: 'GET', path: `${base}/quantum-chain` },
+            { method: 'POST', path: `${base}/quantum-chain/transactions` },
+            { method: 'POST', path: `${base}/quantum-chain/blocks` },
+            { method: 'GET', path: `${base}/quantum-chain/verify` }
+          ],
+          web3: [
+            { method: 'GET', path: `${base}/web3/identities` },
+            { method: 'POST', path: `${base}/web3/identities` },
+            { method: 'POST', path: `${base}/web3/anchor` }
+          ]
+        },
+        curl_examples: [
+          {
+            title: 'Estado general',
+            command: 'curl -X GET http://localhost:8010/api/ai/neuronar'
+          },
+          {
+            title: 'Calibrar nucleo cuantico',
+            command: "curl -X POST http://localhost:8010/api/ai/neuronar/quantum-core/calibrate -H 'Content-Type: application/json' -d '{\"profile\":\"precision\"}'"
+          },
+          {
+            title: 'Crear transaccion cuantica',
+            command: "curl -X POST http://localhost:8010/api/ai/neuronar/quantum-chain/transactions -H 'Content-Type: application/json' -d '{\"from\":\"core-1\",\"to\":\"core-2\",\"payload\":{\"task\":\"balance\"}}'"
+          },
+          {
+            title: 'Registrar identidad Web3',
+            command: "curl -X POST http://localhost:8010/api/ai/neuronar/web3/identities -H 'Content-Type: application/json' -d '{\"alias\":\"city-wallet\"}'"
+          },
+          {
+            title: 'Anclar activo en cadena cuantica',
+            command: "curl -X POST http://localhost:8010/api/ai/neuronar/web3/anchor -H 'Content-Type: application/json' -d '{\"asset_id\":\"robot-nft-001\",\"metadata\":{\"tier\":\"legendary\"}}'"
+          }
+        ]
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Error generando documentacion de NEURONAR:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error generando documentacion',
+      message: error.message
+    });
+  }
+});
+
+// POST /api/ai/neuronar/boot - Reiniciar secuencia de arranque NEURONAR
+router.post('/neuronar/boot', [
+  body('mode').optional().isIn(['standard', 'safe', 'high-performance']).withMessage('modo invalido')
+], (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const result = neuronarSystem.bootSequence(req.body.mode || 'standard');
+    res.json({ success: true, data: result, timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Error iniciando secuencia boot de NEURONAR:', error);
+    res.status(500).json({ success: false, error: 'Error de boot NEURONAR', message: error.message });
+  }
+});
+
+// GET /api/ai/neuronar/quantum-core - Estado del nucleo cuantico
+router.get('/neuronar/quantum-core', (req, res) => {
+  try {
+    const overview = neuronarSystem.getOverview();
+    res.json({ success: true, data: overview.quantum_core, timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Error obteniendo nucleo cuantico:', error);
+    res.status(500).json({ success: false, error: 'Error nucleo cuantico', message: error.message });
+  }
+});
+
+// POST /api/ai/neuronar/quantum-core/calibrate - Calibrar nucleo cuantico
+router.post('/neuronar/quantum-core/calibrate', [
+  body('profile').optional().isIn(['balanced', 'precision', 'throughput']).withMessage('perfil invalido')
+], (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const calibration = neuronarSystem.calibrateQuantumCore(req.body.profile || 'balanced');
+    res.json({ success: true, data: calibration, timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Error calibrando nucleo cuantico:', error);
+    res.status(500).json({ success: false, error: 'Error calibrando nucleo cuantico', message: error.message });
+  }
+});
+
+// POST /api/ai/neuronar/inference - Ejecutar inferencia en NEURONAR
+router.post('/neuronar/inference', validateNeuronarInference, (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const result = neuronarSystem.runInference(req.body.task_type, req.body.input);
+    res.json({ success: true, data: result, timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Error en inferencia NEURONAR:', error);
+    res.status(500).json({ success: false, error: 'Error de inferencia', message: error.message });
+  }
+});
+
+// GET /api/ai/neuronar/quantum-chain - Estado de cadena de bloques cuantica
+router.get('/neuronar/quantum-chain', (req, res) => {
+  try {
+    res.json({ success: true, data: neuronarSystem.getChain(), timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Error obteniendo cadena cuantica:', error);
+    res.status(500).json({ success: false, error: 'Error cadena cuantica', message: error.message });
+  }
+});
+
+// POST /api/ai/neuronar/quantum-chain/transactions - Crear transaccion cuantica pendiente
+router.post('/neuronar/quantum-chain/transactions', validateQuantumTx, (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const tx = neuronarSystem.enqueueQuantumTransaction(req.body);
+    res.status(201).json({ success: true, data: tx, timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Error creando transaccion cuantica:', error);
+    res.status(500).json({ success: false, error: 'Error transaccion cuantica', message: error.message });
+  }
+});
+
+// POST /api/ai/neuronar/quantum-chain/blocks - Minar bloque cuantico
+router.post('/neuronar/quantum-chain/blocks', [
+  body('validator').optional().isString().isLength({ min: 3 }).withMessage('validator invalido')
+], (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const block = neuronarSystem.mineQuantumBlock(req.body.validator || 'neuronar-validator');
+    res.status(201).json({ success: true, data: block, timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Error minando bloque cuantico:', error);
+    res.status(500).json({ success: false, error: 'Error minando bloque', message: error.message });
+  }
+});
+
+// GET /api/ai/neuronar/quantum-chain/verify - Verificar integridad de cadena cuantica
+router.get('/neuronar/quantum-chain/verify', (req, res) => {
+  try {
+    const verification = neuronarSystem.verifyChainIntegrity();
+    res.json({ success: true, data: verification, timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Error verificando cadena cuantica:', error);
+    res.status(500).json({ success: false, error: 'Error verificando cadena', message: error.message });
+  }
+});
+
+// GET /api/ai/neuronar/web3/identities - Listar identidades Web3
+router.get('/neuronar/web3/identities', (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: neuronarSystem.listIdentities(),
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Error listando identidades Web3:', error);
+    res.status(500).json({ success: false, error: 'Error listando identidades', message: error.message });
+  }
+});
+
+// POST /api/ai/neuronar/web3/identities - Registrar identidad Web3
+router.post('/neuronar/web3/identities', validateWeb3Identity, (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const identity = neuronarSystem.registerIdentity(req.body.alias, req.body.address);
+    res.status(201).json({ success: true, data: identity, timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Error registrando identidad Web3:', error);
+    res.status(500).json({ success: false, error: 'Error registrando identidad', message: error.message });
+  }
+});
+
+// POST /api/ai/neuronar/web3/anchor - Anclar activo Web3 en cadena cuantica
+router.post('/neuronar/web3/anchor', validateWeb3Anchor, (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ success: false, errors: errors.array() });
+    }
+
+    const result = neuronarSystem.anchorWeb3(req.body.asset_id, req.body.metadata || {});
+    res.status(201).json({ success: true, data: result, timestamp: new Date().toISOString() });
+  } catch (error) {
+    logger.error('Error anclando activo Web3:', error);
+    res.status(500).json({ success: false, error: 'Error anclando activo Web3', message: error.message });
   }
 });
 

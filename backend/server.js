@@ -11,25 +11,103 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
+
+const tryRequireLocal = (relativePath, fallbackFactory, logger) => {
+  const absolutePath = path.join(__dirname, relativePath);
+  const exists = fs.existsSync(absolutePath) || fs.existsSync(`${absolutePath}.js`);
+
+  if (exists) {
+    return require(relativePath);
+  }
+
+  if (logger) {
+    logger.warn(`Modulo opcional no encontrado: ${relativePath}. Se usara fallback.`);
+  }
+  return fallbackFactory();
+};
+
+const createUnavailableRoute = (name) => {
+  const router = express.Router();
+  router.use((req, res) => {
+    res.status(503).json({
+      success: false,
+      error: 'Modulo no disponible',
+      message: `La ruta ${name} no esta habilitada en esta instalacion.`
+    });
+  });
+  return router;
+};
+
+class FallbackAIService {
+  async initialize() {}
+  async processRequest() {
+    throw new Error('AIService no disponible');
+  }
+  getStatus() {
+    return 'unavailable';
+  }
+  async getRequestsPerMinute() {
+    return 0;
+  }
+  async getAverageResponseTime() {
+    return 0;
+  }
+}
+
+class FallbackSocketService {
+  constructor() {
+    this.connectionCount = 0;
+  }
+  async initialize() {}
+  handleConnection() {
+    this.connectionCount += 1;
+  }
+  handleDisconnection() {
+    this.connectionCount = Math.max(0, this.connectionCount - 1);
+  }
+  handleJoinCity() {}
+  handleRobotCommand() {}
+  handleAvatarAction() {}
+  handleCityInteraction() {}
+  getConnectionCount() {
+    return this.connectionCount;
+  }
+}
+
+class FallbackDatabaseService {
+  async connect() {}
+  async disconnect() {}
+}
 
 // Importar rutas
 const robotRoutes = require('./routes/robots');
 const avatarRoutes = require('./routes/avatars');
 const cityRoutes = require('./routes/city');
 const aiRoutes = require('./routes/ai');
-const userRoutes = require('./routes/users');
-const analyticsRoutes = require('./routes/analytics');
+const authRoutes = require('./routes/auth');
+const logger = require('./utils/logger');
+const userRoutes = tryRequireLocal('./routes/users', () => createUnavailableRoute('users'), logger);
+const analyticsRoutes = tryRequireLocal('./routes/analytics', () => createUnavailableRoute('analytics'), logger);
 
 // Importar middleware
-const errorHandler = require('./middleware/errorHandler');
-const authMiddleware = require('./middleware/auth');
-const logger = require('./utils/logger');
+const errorHandler = tryRequireLocal('./middleware/errorHandler', () => {
+  return (error, req, res, next) => {
+    logger.error('Error no manejado:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Error interno del servidor',
+      message: error?.message || 'Unexpected error'
+    });
+  };
+}, logger);
 
 // Importar servicios
-const AIService = require('./services/aiService');
-const SocketService = require('./services/socketService');
-const DatabaseService = require('./services/databaseService');
+const AIService = tryRequireLocal('./services/aiService', () => FallbackAIService, logger);
+const SocketService = tryRequireLocal('./services/socketService', () => FallbackSocketService, logger);
+const DatabaseService = tryRequireLocal('./services/databaseService', () => FallbackDatabaseService, logger);
 
 class CiudadRobotServer {
   constructor() {
@@ -104,6 +182,7 @@ class CiudadRobotServer {
     this.app.use('/api/avatars', avatarRoutes);
     this.app.use('/api/city', cityRoutes);
     this.app.use('/api/ai', aiRoutes);
+    this.app.use('/api/auth', authRoutes);
     this.app.use('/api/users', userRoutes);
     this.app.use('/api/analytics', analyticsRoutes);
     this.app.use('/api/security', require('./routes/security'));
@@ -129,8 +208,8 @@ class CiudadRobotServer {
       });
     });
 
-    // Ruta 404
-    this.app.use('*', (req, res) => {
+    // Ruta 404 (Express 5: usar middleware sin patron wildcard)
+    this.app.use((req, res) => {
       res.status(404).json({
         error: 'Endpoint no encontrado',
         message: `La ruta ${req.originalUrl} no existe`,

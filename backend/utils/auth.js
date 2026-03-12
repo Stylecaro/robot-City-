@@ -475,6 +475,12 @@ const resourcePermission = (resource, action) => {
         read: ['read'],
         update: ['manage_ai'],
         delete: ['manage_ai']
+      },
+      security: {
+        create: ['create', 'manage'],
+        read: ['read'],
+        update: ['update', 'manage'],
+        delete: ['delete', 'manage']
       }
     };
     

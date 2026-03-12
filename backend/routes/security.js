@@ -1,7 +1,7 @@
-"""
+/*
 Rutas API para el Sistema de Seguridad con Humanoides IA
-Integración con el backend principal
-"""
+Integracion con el backend principal
+*/
 
 const express = require('express');
 const router = express.Router();

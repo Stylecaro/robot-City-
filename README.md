@@ -136,6 +136,7 @@ npm run build
 - [API Reference](docs/api-reference.md)
 - [Arquitectura IA](docs/ai-architecture.md)
 - [Sistema de Robots](docs/robot-system.md)
+- [NEURONAR API](docs/NEURONAR_API.md)
 
 ## 🤝 Contribuir
 
