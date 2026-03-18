@@ -17,7 +17,7 @@ class MetaversoErrorFixer:
     """Reparador de errores del metaverso"""
     
     def __init__(self):
-        self.project_root = Path("c:/Users/Brian Carlisle/mundo virtual")
+        self.project_root = Path(__file__).parent
         self.errors_found = []
         self.fixes_applied = []
         
@@ -115,7 +115,7 @@ class MetaversoErrorFixer:
         print("🔍 Verificando dependencias Python...")
         
         required_packages = [
-            'flask', 'numpy', 'asyncio', 'psutil', 'pathlib'
+            'flask', 'numpy', 'psutil'
         ]
         
         missing_packages = []
@@ -410,7 +410,7 @@ app.listen(PORT, () => {
                     shutil.rmtree(temp_dir)
                     temp_dir.mkdir()
                     print(f"✅ Limpiado: {temp_dir.name}")
-                except:
+                except Exception:
                     print(f"⚠️  No se pudo limpiar: {temp_dir.name}")
         
         self.fixes_applied.append("Sistema optimizado")
@@ -429,7 +429,7 @@ echo ║                      Launcher Profesional                    ║
 echo ╚══════════════════════════════════════════════════════════════╝
 echo.
 
-cd /d "c:\\Users\\Brian Carlisle\\mundo virtual"
+cd /d "%~dp0"
 
 echo 🚀 Iniciando sistemas del metaverso...
 echo.
