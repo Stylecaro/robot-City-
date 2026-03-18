@@ -1,0 +1,5 @@
+numpy
+pytest
+# qiskit          # Descomentar para usar circuitos cuánticos reales con Qiskit
+# qiskit-aer      # Simulador AerSimulator (más preciso que numpy stub)
+# qiskit-ibm-runtime  # Requerido para conexión a IBM Quantum hardware real
