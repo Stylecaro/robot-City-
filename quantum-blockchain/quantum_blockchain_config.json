@@ -1,0 +1,30 @@
+{
+  "quantum_blockchain": {
+    "version": "1.0.0",
+    "name": "Robot City Quantum Blockchain",
+    "consensus_method": "quantum_signature",
+    "mining_enabled": false,
+    "qubit_count": 8,
+    "entanglement_depth": 4,
+    "hash_algorithm": "quantum_rotation_hash",
+    "block_validation": "qubit_signature"
+  },
+  "matrix_creator": {
+    "default_precision": 8,
+    "supported_matrices": [
+      "hadamard",
+      "pauli_x",
+      "pauli_y",
+      "pauli_z",
+      "identity",
+      "cnot",
+      "rotation"
+    ],
+    "max_qubits": 16
+  },
+  "entanglement": {
+    "bell_states": ["phi_plus", "phi_minus", "psi_plus", "psi_minus"],
+    "max_entangled_qubits": 32,
+    "teleportation_enabled": true
+  }
+}
