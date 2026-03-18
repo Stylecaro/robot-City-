@@ -1,0 +1,21 @@
+# Dependencias del módulo quantum-core
+# MIT License — Copyright (c) 2026 Ciudad Robot Team
+#
+# Instalar con:
+#   pip install -r requirements.txt
+
+# Dependencias obligatorias
+numpy>=1.21.0
+
+# Herramientas de testing
+pytest>=7.0.0
+
+# Dependencias opcionales para hardware real:
+# Descomentar para integrar con IBM Quantum (requiere cuenta en https://quantum.ibm.com)
+# qiskit>=1.0.0
+# qiskit-ibm-runtime>=0.20.0
+# qiskit-algorithms>=0.3.0
+
+# Dependencias opcionales para notebooks:
+# jupyter>=1.0.0
+# matplotlib>=3.5.0

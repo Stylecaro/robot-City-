@@ -186,6 +186,7 @@ class CiudadRobotServer {
     this.app.use('/api/users', userRoutes);
     this.app.use('/api/analytics', analyticsRoutes);
     this.app.use('/api/security', require('./routes/security'));
+    this.app.use('/api/quantum', require('./routes/quantum'));
 
     // Documentación de la API
     this.app.get('/api', (req, res) => {
@@ -201,6 +202,7 @@ class CiudadRobotServer {
           '/api/users': 'Gestión de usuarios',
           '/api/analytics': 'Análisis y estadísticas',
           '/api/security': 'Sistema de seguridad con humanoides IA',
+          '/api/quantum': 'Módulo cuántico simulado — circuitos y algoritmos',
           '/health': 'Estado del sistema',
           '/ws': 'WebSocket para tiempo real'
         },
