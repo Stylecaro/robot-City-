@@ -1,0 +1,26 @@
+{
+  "default_backend": "local_simulator",
+  "max_qubits": 16,
+  "default_shots": 1024,
+  "ibmq": {
+    "enabled": false,
+    "backend_name": "ibm_brisbane",
+    "api_key_env_var": "IBMQ_API_KEY"
+  },
+  "simulator": {
+    "seed": null,
+    "noise_model": false
+  },
+  "qaoa": {
+    "default_p": 1,
+    "max_p": 5,
+    "optimizer": "COBYLA"
+  },
+  "grover": {
+    "default_n_iters": 1
+  },
+  "hybrid": {
+    "default_n_qubits": 4,
+    "default_n_outputs": 2
+  }
+}
