@@ -69,6 +69,7 @@ def main():
     print("\n" + "=" * 50)
     print("Resultado JSON completo:")
     # Serializar para salida estándar (útil cuando se llama desde Node.js)
+    # Formato esperado de 'estados': "|XX> -> nombre", donde XX es el identificador binario.
     salida = {
         "circuito": circuito["nombre"],
         "qubits": circuito["qubits"],

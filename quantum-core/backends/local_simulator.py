@@ -96,7 +96,9 @@ class LocalSimulator:
 
         # Simular mediciones aleatorias
         n_estados = len(probabilidades)
-        etiquetas = [format(i, f"0{max(1, int(np.log2(n_estados + 1)))}b") for i in range(n_estados)]
+        # Calcular la anchura de bits necesaria para etiquetar todos los estados
+        bits = max(1, (n_estados - 1).bit_length())
+        etiquetas = [format(i, f"0{bits}b") for i in range(n_estados)]
         conteos_array = np.random.multinomial(self.shots, probabilidades)
         conteos = {etiquetas[i]: int(conteos_array[i]) for i in range(n_estados)}
 

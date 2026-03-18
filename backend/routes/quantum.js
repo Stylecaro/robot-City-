@@ -96,7 +96,12 @@ router.post('/run-circuit', (req, res) => {
   const timer = setTimeout(() => {
     if (!respondido) {
       respondido = true;
-      proceso.kill('SIGTERM');
+      try {
+        proceso.kill('SIGTERM');
+      } catch (killErr) {
+        // El proceso puede haber terminado ya; registrar para observabilidad
+        console.error('[quantum] Error al terminar proceso Python por timeout:', killErr.message);
+      }
       return res.status(503).json({
         success: false,
         error: 'Timeout',

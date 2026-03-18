@@ -125,6 +125,6 @@ class QuantumNeuralLayer:
             mitad = dim // (2 * self.n_outputs) if self.n_outputs > 1 else dim // 2
             idx0 = k * (dim // self.n_outputs)
             idx1 = idx0 + mitad
-            salida[k] = np.sum(prob[idx0:idx1]) - np.sum(prob[idx1: idx0 + dim // self.n_outputs])
+            salida[k] = np.sum(prob[idx0:idx1]) - np.sum(prob[idx1:idx0 + dim // self.n_outputs])
 
         return salida
