@@ -21,7 +21,9 @@ const DEFAULT_PARAMS = {
 
 /**
  * Determina el color del semáforo según los conteos de medición.
- * El qubit 0 codifica el estado del semáforo (0=rojo, 1=verde).
+ * Los bitstrings están en orden big-endian (qubit más significativo primero),
+ * por lo que el último carácter corresponde al qubit 0 (estado del semáforo):
+ * último bit '1' → verde, '0' → rojo.
  *
  * @param {Object} conteos - Mapa bitstring → conteos
  * @returns {'green'|'red'|'yellow'} Color del semáforo

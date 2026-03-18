@@ -22,11 +22,30 @@
 const express = require('express');
 const { spawn } = require('child_process');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 const router = express.Router();
 
+/** Comando Python a usar (configurable via variable de entorno PYTHON_CMD) */
+const PYTHON_CMD = process.env.PYTHON_CMD || 'python';
 /** Tiempo máximo de espera para el script Python (milisegundos) */
 const PYTHON_TIMEOUT_MS = 30000;
+
+/**
+ * Rate limiter específico para rutas de computación cuántica.
+ * Más restrictivo que el global ya que cada petición lanza un proceso Python.
+ */
+const quantumRateLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minuto
+  max: 10,             // máximo 10 peticiones por minuto por IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Demasiadas solicitudes',
+    message: 'Límite de 10 solicitudes por minuto para endpoints cuánticos',
+  },
+});
 
 /** Ruta al script de demostración, relativa a la raíz del repositorio */
 const DEMO_SCRIPT_PATH = path.join(
@@ -59,7 +78,7 @@ const DEMO_SCRIPT_PATH = path.join(
  *   504 - Timeout superado (> 30s)
  *   500 - Error interno del script Python
  */
-router.post('/run-circuit', (req, res) => {
+router.post('/run-circuit', quantumRateLimiter, (req, res) => {
   const params = req.body || {};
 
   // Construir argumentos para el script Python
@@ -92,7 +111,7 @@ router.post('/run-circuit', (req, res) => {
   // Lanzar proceso Python
   let pythonProcess;
   try {
-    pythonProcess = spawn('python', pythonArgs, {
+    pythonProcess = spawn(PYTHON_CMD, pythonArgs, {
       stdio: ['pipe', 'pipe', 'pipe'],
     });
   } catch (spawnErr) {

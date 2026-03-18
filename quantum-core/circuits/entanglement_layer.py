@@ -94,8 +94,8 @@ def entanglement_layer(n_qubits):
     >>> estado = entanglement_layer(2)
     >>> print(estado.shape)
     (4,)
-    >>> print(np.abs(estado).sum())
-    2.0
+    >>> print(round(float(sum(abs(v)**2 for v in estado)), 6))
+    1.0
 
     Notas
     -----
