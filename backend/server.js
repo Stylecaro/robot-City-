@@ -91,6 +91,7 @@ const authRoutes = require('./routes/auth');
 const logger = require('./utils/logger');
 const userRoutes = tryRequireLocal('./routes/users', () => createUnavailableRoute('users'), logger);
 const analyticsRoutes = tryRequireLocal('./routes/analytics', () => createUnavailableRoute('analytics'), logger);
+const quantumRoutes = tryRequireLocal('./routes/quantum', () => createUnavailableRoute('quantum'), logger);
 
 // Importar middleware
 const errorHandler = tryRequireLocal('./middleware/errorHandler', () => {
@@ -186,6 +187,7 @@ class CiudadRobotServer {
     this.app.use('/api/users', userRoutes);
     this.app.use('/api/analytics', analyticsRoutes);
     this.app.use('/api/security', require('./routes/security'));
+    this.app.use('/api/quantum', quantumRoutes);
 
     // Documentación de la API
     this.app.get('/api', (req, res) => {
@@ -201,6 +203,7 @@ class CiudadRobotServer {
           '/api/users': 'Gestión de usuarios',
           '/api/analytics': 'Análisis y estadísticas',
           '/api/security': 'Sistema de seguridad con humanoides IA',
+          '/api/quantum': 'Módulo cuántico — circuitos y simulación',
           '/health': 'Estado del sistema',
           '/ws': 'WebSocket para tiempo real'
         },

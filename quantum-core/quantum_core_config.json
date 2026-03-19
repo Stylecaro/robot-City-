@@ -1,0 +1,5 @@
+{
+  "default_backend": "local_simulator",
+  "max_qubits": 16,
+  "version": "1.0.0"
+}
