@@ -22,6 +22,19 @@ from core.decision_engine import DecisionEngine
 from core.quantum_core import QuantumCore
 from utils.logger import setup_logger
 from utils.database import DatabaseManager
+from utils.metrics import (
+    PrometheusMiddleware,
+    metrics_endpoint,
+    ws_connections_total,
+    ws_active_connections,
+    active_robots,
+    system_health as system_health_gauge,
+    cpu_usage as cpu_usage_gauge,
+    memory_usage as memory_usage_gauge,
+    robot_commands_total,
+    decisions_total,
+    neural_inference_duration,
+)
 
 # Routers API
 from routes.metaverse_endpoints import router as metaverse_router
@@ -30,6 +43,7 @@ from routes.shop_endpoints import router as shop_router
 from routes.finance_endpoints import router as finance_router
 from routes.security_endpoints import router as security_router
 from routes.prison_endpoints import router as prison_router
+from routes.pqc_endpoints import router as pqc_router
 
 # Configuración de logging
 logger = setup_logger("ai_engine")
@@ -75,6 +89,7 @@ class AIEngine:
     
     def setup_cors(self):
         """Configurar CORS para permitir conexiones del frontend"""
+        self.app.add_middleware(PrometheusMiddleware)
         self.app.add_middleware(
             CORSMiddleware,
             allow_origins=["http://localhost:3000", "http://localhost:8080"],
@@ -93,7 +108,12 @@ class AIEngine:
         self.app.include_router(finance_router)
         self.app.include_router(security_router)
         self.app.include_router(prison_router)
-        
+        self.app.include_router(pqc_router)
+
+        @self.app.get("/metrics")
+        async def prometheus_metrics():
+            return metrics_endpoint()
+
         @self.app.get("/")
         async def root():
             return {"message": "Ciudad Robot AI Engine", "status": "active"}
@@ -186,6 +206,8 @@ class AIEngine:
         """Manejar nueva conexión WebSocket"""
         await websocket.accept()
         self.active_connections.append(websocket)
+        ws_connections_total.inc()
+        ws_active_connections.inc()
         
         try:
             # Enviar estado inicial
@@ -201,6 +223,7 @@ class AIEngine:
                 
         except WebSocketDisconnect:
             self.active_connections.remove(websocket)
+            ws_active_connections.dec()
             logger.info("Cliente WebSocket desconectado")
         except Exception as e:
             logger.error(f"Error en WebSocket: {e}")
@@ -276,6 +299,12 @@ class AIEngine:
         self.system_status.memory_usage = psutil.virtual_memory().percent
         self.system_status.system_health = await self.calculate_system_health()
         self.system_status.last_update = datetime.now().isoformat()
+
+        # Actualizar gauges Prometheus
+        active_robots.set(self.system_status.active_robots)
+        system_health_gauge.set(self.system_status.system_health)
+        cpu_usage_gauge.set(self.system_status.cpu_usage)
+        memory_usage_gauge.set(self.system_status.memory_usage)
     
     async def get_processing_tasks(self) -> int:
         """Obtener número de tareas en procesamiento"""

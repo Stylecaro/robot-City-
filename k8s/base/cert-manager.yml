@@ -1,0 +1,46 @@
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: admin@ciudadrobot.io
+    privateKeySecretRef:
+      name: letsencrypt-prod-key
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: admin@ciudadrobot.io
+    privateKeySecretRef:
+      name: letsencrypt-staging-key
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ciudad-robot-tls
+  namespace: ciudad-robot
+spec:
+  secretName: ciudad-robot-tls-secret
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+    - ciudadrobot.io
+    - api.ciudadrobot.io
+    - ai.ciudadrobot.io
+    - grafana.ciudadrobot.io

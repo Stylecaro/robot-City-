@@ -1,0 +1,58 @@
+groups:
+  - name: ciudad_robot_alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status_code=~"5.."}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Alta tasa de errores HTTP 5xx en {{ $labels.job }}"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Latencia P95 superior a 2s en {{ $labels.job }}"
+
+      - alert: AIEngineDown
+        expr: up{job="ai-engine-python"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "AI Engine no responde"
+
+      - alert: BackendDown
+        expr: up{job="backend-node"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend Node.js no responde"
+
+      - alert: MongoDBDown
+        expr: up{job="mongodb-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MongoDB no responde"
+
+      - alert: HighCPUUsage
+        expr: ai_cpu_usage_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Uso de CPU alto en AI Engine: {{ $value }}%"
+
+      - alert: HighMemoryUsage
+        expr: ai_memory_usage_percent > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Uso de memoria alto en AI Engine: {{ $value }}%"

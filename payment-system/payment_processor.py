@@ -8,6 +8,12 @@ from typing import Dict, List, Optional
 from datetime import datetime, timedelta
 import uuid
 import hashlib
+import sys
+import os
+
+# Importar PQC desde quantum-blockchain
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'quantum-blockchain'))
+from pqc_crypto import pqc_manager, sha3_256
 
 class PaymentMethod(Enum):
     """Métodos de pago disponibles"""
@@ -62,6 +68,7 @@ class Transaction:
         self.completed_at: Optional[datetime] = None
         self.metadata: Dict = {}
         self.receipt_hash = ""
+        self.pqc_signature: Optional[dict] = None
         
     def process(self) -> bool:
         """Procesa la transacción"""
@@ -77,15 +84,33 @@ class Transaction:
             
             self.completed_at = datetime.now()
             self.receipt_hash = self._generate_receipt()
+            self.pqc_signature = self._sign_pqc()
             return True
         except Exception as e:
             self.status = TransactionStatus.FAILED
             return False
     
     def _generate_receipt(self) -> str:
-        """Genera hash de recibo"""
+        """Genera hash de recibo con SHA3-256 (resistente a Grover)."""
         receipt_str = f"{self.transaction_id}{self.player_id}{self.amount}{self.created_at}"
-        return hashlib.sha256(receipt_str.encode()).hexdigest()[:16]
+        return sha3_256(receipt_str.encode()).hex()[:16]
+    
+    def _sign_pqc(self) -> dict:
+        """Firma la transacción con ML-DSA (Dilithium) post-cuántico."""
+        entity_id = f"wallet-{self.player_id}"
+        if entity_id not in pqc_manager.key_store:
+            pqc_manager.generate_key_bundle(entity_id)
+        tx_data = f"{self.transaction_id}{self.amount}{self.receipt_hash}".encode()
+        return pqc_manager.sign_transaction(entity_id, tx_data)
+    
+    def verify_pqc(self) -> bool:
+        """Verifica la firma PQC de la transacción."""
+        if not self.pqc_signature:
+            return False
+        entity_id = f"wallet-{self.player_id}"
+        tx_data = f"{self.transaction_id}{self.amount}{self.receipt_hash}".encode()
+        result = pqc_manager.verify_transaction(entity_id, tx_data, self.pqc_signature)
+        return result.get("valid", False)
     
     def refund(self) -> bool:
         """Reembolsa la transacción"""
@@ -105,7 +130,8 @@ class Transaction:
             "status": self.status.value,
             "created_at": self.created_at.isoformat(),
             "completed_at": self.completed_at.isoformat() if self.completed_at else None,
-            "receipt_hash": self.receipt_hash
+            "receipt_hash": self.receipt_hash,
+            "pqc_protected": self.pqc_signature is not None,
         }
 
 class PlayerWallet:

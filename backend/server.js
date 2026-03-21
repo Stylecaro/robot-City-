@@ -15,6 +15,17 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
+// Métricas Prometheus
+const {
+  register,
+  metricsMiddleware,
+  wsConnectionsTotal,
+  wsMessagesTotal,
+  wsActiveConnections,
+  robotsActive,
+  cityEfficiency,
+} = require('./utils/metrics');
+
 const tryRequireLocal = (relativePath, fallbackFactory, logger) => {
   const absolutePath = path.join(__dirname, relativePath);
   const exists = fs.existsSync(absolutePath) || fs.existsSync(`${absolutePath}.js`);
@@ -153,6 +164,9 @@ class CiudadRobotServer {
     });
     this.app.use(limiter);
     
+    // Métricas Prometheus
+    this.app.use(metricsMiddleware);
+
     // Logging
     this.app.use(morgan('combined', { 
       stream: { write: message => logger.info(message.trim()) }
@@ -178,6 +192,12 @@ class CiudadRobotServer {
       });
     });
 
+    // Endpoint de métricas Prometheus
+    this.app.get('/metrics', async (req, res) => {
+      res.set('Content-Type', register.contentType);
+      res.end(await register.metrics());
+    });
+
     // API Routes
     this.app.use('/api/robots', robotRoutes);
     this.app.use('/api/avatars', avatarRoutes);
@@ -188,6 +208,7 @@ class CiudadRobotServer {
     this.app.use('/api/analytics', analyticsRoutes);
     this.app.use('/api/security', require('./routes/security'));
     this.app.use('/api/quantum', quantumRoutes);
+    this.app.use('/api/pqc', require('./routes/pqc'));
 
     // Documentación de la API
     this.app.get('/api', (req, res) => {
@@ -224,6 +245,8 @@ class CiudadRobotServer {
   setupSocketHandlers() {
     this.io.on('connection', (socket) => {
       logger.info(`Cliente conectado: ${socket.id}`);
+      wsConnectionsTotal.inc();
+      wsActiveConnections.inc();
       
       // Registrar cliente en el servicio de sockets
       this.socketService.handleConnection(socket);
@@ -234,6 +257,7 @@ class CiudadRobotServer {
       });
       
       socket.on('robot_command', (data) => {
+        wsMessagesTotal.inc({ event: 'robot_command' });
         this.socketService.handleRobotCommand(socket, data);
       });
       
@@ -256,6 +280,7 @@ class CiudadRobotServer {
       
       socket.on('disconnect', (reason) => {
         logger.info(`Cliente desconectado: ${socket.id}, razón: ${reason}`);
+        wsActiveConnections.dec();
         this.socketService.handleDisconnection(socket);
       });
       

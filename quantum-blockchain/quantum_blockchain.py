@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 
 import numpy as np
 
+from pqc_crypto import pqc_manager, sha3_256
+
 
 class QuantumBlock:
     """
@@ -50,6 +52,9 @@ class QuantumBlock:
             }, sort_keys=True)
         )
 
+        # Firma post-cuántica ML-DSA (Dilithium) — resistente a Shor
+        self.pqc_signature = self._generate_pqc_signature()
+
     def recalculate_signature(self) -> np.ndarray:
         """
         Recalcula y devuelve la firma de qubits del bloque.
@@ -60,6 +65,41 @@ class QuantumBlock:
             np.ndarray: Firma de qubits recalculada.
         """
         return self._generate_qubit_signature()
+
+    def _generate_pqc_signature(self) -> dict:
+        """
+        Genera firma post-cuántica ML-DSA del bloque.
+
+        Usa el PQCManager global para firmar el quantum_hash con
+        Dilithium (FIPS 204), protegiendo contra ataques con
+        computadoras cuánticas (algoritmo de Shor).
+
+        Returns:
+            dict: Datos de la firma PQC con algoritmo y hash firmado.
+        """
+        block_entity = f"block-{self.index}"
+        if block_entity not in pqc_manager.key_store:
+            pqc_manager.generate_key_bundle(block_entity)
+        sig_data = pqc_manager.sign_transaction(
+            block_entity, self.quantum_hash.encode("utf-8")
+        )
+        return {
+            "ml_dsa_signature": sig_data["ml_dsa_signature"],
+            "tx_hash_sha3": sig_data["tx_hash_sha3"],
+            "algorithm": sig_data["algorithms"]["primary"],
+        }
+
+    def verify_pqc_signature(self) -> bool:
+        """Verifica la firma post-cuántica del bloque."""
+        block_entity = f"block-{self.index}"
+        if block_entity not in pqc_manager.key_store:
+            return False
+        result = pqc_manager.verify_transaction(
+            block_entity,
+            self.quantum_hash.encode("utf-8"),
+            self.pqc_signature,
+        )
+        return result.get("valid", False)
 
     @staticmethod
     def _signature_to_serializable(signature: np.ndarray) -> list:
@@ -153,6 +193,7 @@ class QuantumBlock:
             "previous_hash": self.previous_hash,
             "quantum_hash": self.quantum_hash,
             "qubit_signature": self._signature_to_serializable(self.qubit_signature),
+            "pqc_signature": self.pqc_signature,
         }
 
     def __repr__(self) -> str:
@@ -241,23 +282,25 @@ class QuantumBlockchain:
 
     def _validar_firma_cuantica(self, bloque: QuantumBlock) -> bool:
         """
-        Valida la firma cuántica de un bloque individual.
+        Valida la firma cuántica y la firma PQC de un bloque.
 
         Verifica que la firma de qubits sea coherente con los datos
-        del bloque mediante recalculación y comparación.
+        del bloque y que la firma post-cuántica ML-DSA sea válida.
 
         Args:
             bloque: Bloque a validar.
 
         Returns:
-            bool: True si la firma es válida, False en caso contrario.
+            bool: True si ambas firmas son válidas.
         """
         firma_recalculada = bloque.recalculate_signature()
-        return np.allclose(
+        qubit_ok = np.allclose(
             np.abs(firma_recalculada),
             np.abs(bloque.qubit_signature),
             atol=1e-10,
         )
+        pqc_ok = bloque.verify_pqc_signature()
+        return qubit_ok and pqc_ok
 
     def validate_chain(self) -> bool:
         """
@@ -318,6 +361,7 @@ class QuantumBlockchain:
             "es_valida": self.validate_chain(),
             "ultimo_hash": self.cadena[-1].quantum_hash if self.cadena else None,
             "bloques": [bloque.to_dict() for bloque in self.cadena],
+            "pqc_security": pqc_manager.get_security_status(),
         }
 
     @staticmethod

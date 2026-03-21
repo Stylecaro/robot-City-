@@ -1,0 +1,98 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ciudad-robot-ingress
+  namespace: ciudad-robot
+  annotations:
+    # Cert-Manager
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+
+    # Nginx Ingress Controller
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+    # Seguridad
+    nginx.ingress.kubernetes.io/server-snippet: |
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+      add_header X-Content-Type-Options "nosniff" always;
+      add_header X-Frame-Options "SAMEORIGIN" always;
+      add_header X-XSS-Protection "1; mode=block" always;
+      add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Rate Limiting
+    nginx.ingress.kubernetes.io/limit-rps: "50"
+    nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+
+    # Proxy
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+
+    # WebSocket
+    nginx.ingress.kubernetes.io/websocket-services: "backend,ai-engine"
+    nginx.ingress.kubernetes.io/proxy-http-version: "1.1"
+
+    # CORS
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://ciudadrobot.io"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
+
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ciudadrobot.io
+        - api.ciudadrobot.io
+        - ai.ciudadrobot.io
+        - grafana.ciudadrobot.io
+      secretName: ciudad-robot-tls-secret
+  rules:
+    # Frontend — ciudadrobot.io
+    - host: ciudadrobot.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 3000
+
+    # Backend API — api.ciudadrobot.io
+    - host: api.ciudadrobot.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8000
+
+    # AI Engine — ai.ciudadrobot.io
+    - host: ai.ciudadrobot.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-engine
+                port:
+                  number: 8765
+
+    # Grafana — grafana.ciudadrobot.io
+    - host: grafana.ciudadrobot.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: grafana
+                port:
+                  number: 3000
