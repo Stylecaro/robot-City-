@@ -19,7 +19,7 @@
     "@mui/icons-material": "^5.15.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "leva": "^0.9.35",
+    "leva": "^0.10.1",
     "zustand": "^4.4.7",
     "framer-motion": "^10.16.16",
     "react-spring": "^9.7.3",
