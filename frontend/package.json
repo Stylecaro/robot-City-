@@ -22,7 +22,7 @@
     "leva": "^0.9.35",
     "zustand": "^4.4.7",
     "framer-motion": "^10.16.16",
-    "react-spring": "^9.7.3",
+    "react-spring": "^10.0.3",
     "gsap": "^3.12.2"
   },
   "devDependencies": {
