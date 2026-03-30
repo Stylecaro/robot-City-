@@ -6,7 +6,8 @@ either ``liboqs-python`` (``pip install liboqs``) or ``pqcrypto``
 (``pip install pqcrypto``).  Until those libraries are installed, all
 signing/verification operations return clearly marked placeholder results.
 
-SHA3-256 hashing is fully implemented using the standard library.
+SHA3-256 hashing is fully implemented using the standard library
+(requires Python 3.6+, available in hashlib.sha3_256 since Python 3.6).
 """
 
 from __future__ import annotations

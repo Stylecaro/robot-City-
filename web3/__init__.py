@@ -6,7 +6,8 @@ Designed to be extended with additional chains.
 from .base_chain import ChainAdapter, ChainType, NetworkConfig, TransactionRecord
 from .evm_adapter import EVMAdapter
 from .solana_adapter import SolanaAdapter
-from .bitcoin_adapter import BitcoinAdapter
+from .bitcoin_adapter import BitcoinAdapter, LightningAdapter
+from .tron_adapter import TronAdapter
 from .chain_registry import ChainRegistry
 
 __all__ = [
@@ -17,5 +18,7 @@ __all__ = [
     "EVMAdapter",
     "SolanaAdapter",
     "BitcoinAdapter",
+    "LightningAdapter",
+    "TronAdapter",
     "ChainRegistry",
 ]
