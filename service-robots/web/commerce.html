@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Robot Comerciante 🛒</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+      min-height: 100vh;
+      color: #e6edf3;
+    }
+    header {
+      background: rgba(22,27,34,0.95);
+      border-bottom: 1px solid #30363d;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header .icon { font-size: 2.5rem; }
+    header h1 { font-size: 1.8rem; color: #58a6ff; }
+    header p { color: #8b949e; font-size: 0.9rem; }
+    .status-bar {
+      background: rgba(35, 134, 54, 0.15);
+      border-bottom: 1px solid rgba(35,134,54,0.3);
+      padding: 10px 40px;
+      color: #3fb950;
+      font-size: 0.9rem;
+    }
+    .container { max-width: 1000px; margin: 0 auto; padding: 40px; }
+    .section { margin-bottom: 32px; }
+    .section h2 { font-size: 1.2rem; color: #e6edf3; margin-bottom: 16px; border-left: 3px solid #58a6ff; padding-left: 10px; }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .product-card {
+      background: rgba(22,27,34,0.8);
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+    .product-card:hover { border-color: #58a6ff; transform: translateY(-2px); }
+    .product-card.selected { border-color: #3fb950; background: rgba(35,134,54,0.1); }
+    .product-card .price { color: #3fb950; font-size: 1.1rem; font-weight: 700; margin: 8px 0 4px; }
+    .product-card .stock { color: #8b949e; font-size: 0.8rem; }
+    .product-card .category { display: inline-block; background: rgba(88,166,255,0.1); color: #58a6ff; border-radius: 10px; padding: 2px 8px; font-size: 0.75rem; margin-bottom: 6px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 0.85rem; color: #8b949e; }
+    input, select {
+      background: rgba(22,27,34,0.8);
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: #58a6ff; }
+    select option { background: #161b22; }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, transform 0.1s;
+      margin-right: 10px;
+      margin-top: 4px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: #238636; color: #fff; }
+    .btn-primary:hover { background: #2ea043; }
+    .btn-info { background: rgba(88,166,255,0.15); color: #58a6ff; border: 1px solid rgba(88,166,255,0.3); }
+    .btn-info:hover { background: rgba(88,166,255,0.25); }
+    .result-box {
+      background: rgba(22,27,34,0.8);
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      display: none;
+    }
+    .result-box pre { white-space: pre-wrap; word-break: break-word; }
+    a { color: #58a6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="icon">🛒</div>
+    <div>
+      <h1>Robot Comerciante</h1>
+      <p>Puerto 8004 · Tienda Online Automatizada · <a href="/docs">API Docs</a> · <a href="/web/index.html">← Inicio</a></p>
+    </div>
+  </header>
+  <div class="status-bar" id="statusBar">⬤ &nbsp;Verificando estado del robot…</div>
+
+  <div class="container">
+    <!-- Catálogo -->
+    <div class="section">
+      <h2>🛍️ Catálogo de Productos</h2>
+      <button class="btn btn-info" onclick="loadProducts()">🔄 Cargar Productos</button>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+
+    <!-- Hacer Pedido -->
+    <div class="section">
+      <h2>📦 Realizar Pedido</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Tu nombre</label>
+          <input type="text" id="order-name" placeholder="Nombre del cliente" />
+        </div>
+        <div class="form-group">
+          <label>Teléfono de contacto</label>
+          <input type="tel" id="order-phone" placeholder="+34 600 000 000" />
+        </div>
+        <div class="form-group">
+          <label>ID del producto</label>
+          <input type="text" id="order-product" placeholder="Ej: P001" />
+        </div>
+        <div class="form-group">
+          <label>Cantidad</label>
+          <input type="number" id="order-qty" value="1" min="1" />
+        </div>
+        <div class="form-group full">
+          <label>Dirección de entrega</label>
+          <input type="text" id="order-address" placeholder="Calle, número, ciudad, código postal" />
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="placeOrder()">🛒 Realizar Pedido</button>
+      <div class="result-box" id="order-result"><pre id="order-result-text"></pre></div>
+    </div>
+
+    <!-- Consultar Pedido -->
+    <div class="section">
+      <h2>🔍 Estado del Pedido</h2>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>ID del pedido</label>
+          <input type="text" id="track-order-id" placeholder="Pega el ID de tu pedido" />
+        </div>
+      </div>
+      <button class="btn btn-info" onclick="getOrder()">🔍 Consultar</button>
+      <div class="result-box" id="track-order-result"><pre id="track-order-result-text"></pre></div>
+    </div>
+  </div>
+
+  <script>
+    const API = '';
+
+    async function checkStatus() {
+      try {
+        const r = await fetch(API + '/health');
+        const d = await r.json();
+        document.getElementById('statusBar').innerHTML =
+          `⬤ &nbsp;Robot Comerciante: <strong>${d.status}</strong> · ${new Date(d.timestamp).toLocaleString('es')}`;
+        document.getElementById('statusBar').style.color = '#3fb950';
+      } catch {
+        document.getElementById('statusBar').textContent = '⬤  Robot Comerciante: desconectado';
+        document.getElementById('statusBar').style.color = '#f85149';
+      }
+    }
+
+    async function loadProducts() {
+      try {
+        const r = await fetch(API + '/api/commerce/products');
+        const d = await r.json();
+        const grid = document.getElementById('productsGrid');
+        grid.innerHTML = '';
+        d.products.forEach(p => {
+          const card = document.createElement('div');
+          card.className = 'product-card';
+          card.innerHTML = `
+            <span class="category">${p.category}</span>
+            <div style="font-weight:600">${p.name}</div>
+            <div class="price">€${p.price.toFixed(2)}</div>
+            <div class="stock">Stock: ${p.stock} unidades · ID: ${p.id}</div>
+          `;
+          card.onclick = () => {
+            document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            document.getElementById('order-product').value = p.id;
+          };
+          grid.appendChild(card);
+        });
+      } catch (e) { alert('Error cargando productos: ' + e.message); }
+    }
+
+    async function placeOrder() {
+      const body = {
+        customer_name: document.getElementById('order-name').value,
+        product_id: document.getElementById('order-product').value,
+        quantity: parseInt(document.getElementById('order-qty').value),
+        delivery_address: document.getElementById('order-address').value,
+        contact_phone: document.getElementById('order-phone').value,
+      };
+      try {
+        const r = await fetch(API + '/api/commerce/order', {
+          method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
+        });
+        const d = await r.json();
+        if (d.order?.id) document.getElementById('track-order-id').value = d.order.id;
+        showResult('order', d);
+      } catch (e) { showResult('order', {error: e.message}); }
+    }
+
+    async function getOrder() {
+      const id = document.getElementById('track-order-id').value.trim();
+      if (!id) return alert('Introduce un ID de pedido');
+      try {
+        const r = await fetch(API + `/api/commerce/order/${id}`);
+        showResult('track-order', await r.json());
+      } catch (e) { showResult('track-order', {error: e.message}); }
+    }
+
+    function showResult(prefix, data) {
+      const box = document.getElementById(prefix + '-result');
+      document.getElementById(prefix + '-result-text').textContent = JSON.stringify(data, null, 2);
+      box.style.display = 'block';
+    }
+
+    checkStatus();
+    loadProducts();
+    setInterval(checkStatus, 30000);
+  </script>
+</body>
+</html>

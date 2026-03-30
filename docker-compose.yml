@@ -183,6 +183,138 @@ services:
     networks:
       - ciudad-robot-network
 
+  # ─── Robot Médico ─────────────────────────────────────────────
+  robot-medico:
+    build:
+      context: .
+      dockerfile: service-robots/Dockerfile
+    container_name: ciudad-robot-medico
+    restart: always
+    command: python medical_robot.py
+    ports:
+      - "8001:8001"
+    environment:
+      PYTHONUNBUFFERED: 1
+      ROBOT_NAME: medical
+      ROBOT_PORT: 8001
+    networks:
+      - ciudad-robot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── Robot Policía ────────────────────────────────────────────
+  robot-policia:
+    build:
+      context: .
+      dockerfile: service-robots/Dockerfile
+    container_name: ciudad-robot-policia
+    restart: always
+    command: python security_robot.py
+    ports:
+      - "8002:8002"
+    environment:
+      PYTHONUNBUFFERED: 1
+      ROBOT_NAME: security
+      ROBOT_PORT: 8002
+    networks:
+      - ciudad-robot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── Robot Transporte ─────────────────────────────────────────
+  robot-transporte:
+    build:
+      context: .
+      dockerfile: service-robots/Dockerfile
+    container_name: ciudad-robot-transporte
+    restart: always
+    command: python transport_robot.py
+    ports:
+      - "8003:8003"
+    environment:
+      PYTHONUNBUFFERED: 1
+      ROBOT_NAME: transport
+      ROBOT_PORT: 8003
+    networks:
+      - ciudad-robot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── Robot Comerciante ────────────────────────────────────────
+  robot-comerciante:
+    build:
+      context: .
+      dockerfile: service-robots/Dockerfile
+    container_name: ciudad-robot-comerciante
+    restart: always
+    command: python commerce_robot.py
+    ports:
+      - "8004:8004"
+    environment:
+      PYTHONUNBUFFERED: 1
+      ROBOT_NAME: commerce
+      ROBOT_PORT: 8004
+    networks:
+      - ciudad-robot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── Robot Constructor ────────────────────────────────────────
+  robot-constructor:
+    build:
+      context: .
+      dockerfile: service-robots/Dockerfile
+    container_name: ciudad-robot-constructor
+    restart: always
+    command: python builder_robot.py
+    ports:
+      - "8005:8005"
+    environment:
+      PYTHONUNBUFFERED: 1
+      ROBOT_NAME: builder
+      ROBOT_PORT: 8005
+    networks:
+      - ciudad-robot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─── Robot Maestro ────────────────────────────────────────────
+  robot-maestro:
+    build:
+      context: .
+      dockerfile: service-robots/Dockerfile
+    container_name: ciudad-robot-maestro
+    restart: always
+    command: python teacher_robot.py
+    ports:
+      - "8006:8006"
+    environment:
+      PYTHONUNBUFFERED: 1
+      ROBOT_NAME: teacher
+      ROBOT_PORT: 8006
+    networks:
+      - ciudad-robot-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
 volumes:
   mongodb_data:
   mongodb_config:
