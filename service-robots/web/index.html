@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ciudad Robot — Robots de Servicio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+      min-height: 100vh;
+      color: #e6edf3;
+    }
+    header {
+      background: rgba(22, 27, 34, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #30363d;
+      padding: 20px 40px;
+      text-align: center;
+    }
+    header h1 { font-size: 2.2rem; color: #58a6ff; margin-bottom: 6px; }
+    header p { color: #8b949e; font-size: 1rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: rgba(22, 27, 34, 0.8);
+      border: 1px solid #30363d;
+      border-radius: 16px;
+      padding: 28px;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: #58a6ff;
+      box-shadow: 0 8px 30px rgba(88, 166, 255, 0.15);
+    }
+    .card-icon { font-size: 3rem; margin-bottom: 12px; }
+    .card h2 { font-size: 1.3rem; color: #e6edf3; margin-bottom: 8px; }
+    .card p { color: #8b949e; font-size: 0.9rem; line-height: 1.5; margin-bottom: 16px; }
+    .badge {
+      display: inline-block;
+      background: rgba(88, 166, 255, 0.15);
+      color: #58a6ff;
+      border: 1px solid rgba(88, 166, 255, 0.3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      margin-bottom: 16px;
+    }
+    .btn {
+      display: inline-block;
+      background: #238636;
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: background 0.2s;
+      margin-right: 8px;
+      margin-top: 4px;
+    }
+    .btn:hover { background: #2ea043; }
+    .btn.secondary {
+      background: rgba(88, 166, 255, 0.15);
+      color: #58a6ff;
+      border: 1px solid rgba(88, 166, 255, 0.3);
+    }
+    .btn.secondary:hover { background: rgba(88, 166, 255, 0.25); }
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #8b949e;
+      font-size: 0.85rem;
+      border-top: 1px solid #30363d;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🤖 Ciudad Robot — Robots de Servicio</h1>
+    <p>Sistema completo de robots de servicio para la vida real · Potenciado por FastAPI</p>
+  </header>
+
+  <div class="grid">
+    <!-- Robot Médico -->
+    <div class="card">
+      <div class="card-icon">🏥</div>
+      <h2>Robot Médico</h2>
+      <span class="badge">Puerto 8001</span>
+      <p>Asistencia sanitaria y teleasistencia médica. Reporta emergencias, solicita citas y monitorea el estado de salud en tiempo real.</p>
+      <a href="http://localhost:8001" class="btn">Abrir Portal</a>
+      <a href="http://localhost:8001/docs" class="btn secondary">API Docs</a>
+    </div>
+
+    <!-- Robot Policía -->
+    <div class="card">
+      <div class="card-icon">🚔</div>
+      <h2>Robot Policía</h2>
+      <span class="badge">Puerto 8002</span>
+      <p>Seguridad y patrullaje inteligente. Envía alertas, reporta incidentes y monitorea el estado de las unidades de patrulla.</p>
+      <a href="http://localhost:8002" class="btn">Abrir Portal</a>
+      <a href="http://localhost:8002/docs" class="btn secondary">API Docs</a>
+    </div>
+
+    <!-- Robot Transporte -->
+    <div class="card">
+      <div class="card-icon">🚌</div>
+      <h2>Robot Transporte</h2>
+      <span class="badge">Puerto 8003</span>
+      <p>Gestión de rutas, entregas y rastreo en tiempo real. Solicita transporte o seguimiento de paquetes con tracking en vivo.</p>
+      <a href="http://localhost:8003" class="btn">Abrir Portal</a>
+      <a href="http://localhost:8003/docs" class="btn secondary">API Docs</a>
+    </div>
+
+    <!-- Robot Comerciante -->
+    <div class="card">
+      <div class="card-icon">🛒</div>
+      <h2>Robot Comerciante</h2>
+      <span class="badge">Puerto 8004</span>
+      <p>Tienda online automatizada con catálogo de productos robóticos. Realiza pedidos y monitorea el estado de tu compra.</p>
+      <a href="http://localhost:8004" class="btn">Abrir Portal</a>
+      <a href="http://localhost:8004/docs" class="btn secondary">API Docs</a>
+    </div>
+
+    <!-- Robot Constructor -->
+    <div class="card">
+      <div class="card-icon">🏗️</div>
+      <h2>Robot Constructor</h2>
+      <span class="badge">Puerto 8005</span>
+      <p>Gestión de proyectos de construcción automatizados. Crea proyectos, asigna robots y actualiza el progreso en tiempo real.</p>
+      <a href="http://localhost:8005" class="btn">Abrir Portal</a>
+      <a href="http://localhost:8005/docs" class="btn secondary">API Docs</a>
+    </div>
+
+    <!-- Robot Maestro -->
+    <div class="card">
+      <div class="card-icon">🎓</div>
+      <h2>Robot Maestro</h2>
+      <span class="badge">Puerto 8006</span>
+      <p>Plataforma educativa robótica con cursos de robótica, Python, IA y computación cuántica. Inscríbete y aprende con IA.</p>
+      <a href="http://localhost:8006" class="btn">Abrir Portal</a>
+      <a href="http://localhost:8006/docs" class="btn secondary">API Docs</a>
+    </div>
+  </div>
+
+  <footer>
+    🤖 Ciudad Robot · Robots de Servicio para la Vida Real · <a href="https://github.com/Stylecaro/robot-City-" style="color:#58a6ff">GitHub</a>
+  </footer>
+</body>
+</html>

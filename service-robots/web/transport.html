@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Robot Transporte 🚌</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+      min-height: 100vh;
+      color: #e6edf3;
+    }
+    header {
+      background: rgba(22,27,34,0.95);
+      border-bottom: 1px solid #30363d;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header .icon { font-size: 2.5rem; }
+    header h1 { font-size: 1.8rem; color: #58a6ff; }
+    header p { color: #8b949e; font-size: 0.9rem; }
+    .status-bar {
+      background: rgba(35, 134, 54, 0.15);
+      border-bottom: 1px solid rgba(35,134,54,0.3);
+      padding: 10px 40px;
+      color: #3fb950;
+      font-size: 0.9rem;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 40px; }
+    .section { margin-bottom: 32px; }
+    .section h2 { font-size: 1.2rem; color: #e6edf3; margin-bottom: 16px; border-left: 3px solid #58a6ff; padding-left: 10px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 0.85rem; color: #8b949e; }
+    input, select, textarea {
+      background: rgba(22,27,34,0.8);
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: #58a6ff; }
+    select option { background: #161b22; }
+    .btn {
+      display: inline-block;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, transform 0.1s;
+      margin-right: 10px;
+      margin-top: 4px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: #238636; color: #fff; }
+    .btn-primary:hover { background: #2ea043; }
+    .btn-info { background: rgba(88,166,255,0.15); color: #58a6ff; border: 1px solid rgba(88,166,255,0.3); }
+    .btn-info:hover { background: rgba(88,166,255,0.25); }
+    .result-box {
+      background: rgba(22,27,34,0.8);
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      display: none;
+    }
+    .result-box pre { white-space: pre-wrap; word-break: break-word; }
+    a { color: #58a6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="icon">🚌</div>
+    <div>
+      <h1>Robot Transporte</h1>
+      <p>Puerto 8003 · Gestión de Rutas y Entregas · <a href="/docs">API Docs</a> · <a href="/web/index.html">← Inicio</a></p>
+    </div>
+  </header>
+  <div class="status-bar" id="statusBar">⬤ &nbsp;Verificando estado del robot…</div>
+
+  <div class="container">
+    <!-- Solicitar Transporte -->
+    <div class="section">
+      <h2>🚀 Solicitar Transporte o Entrega</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre de contacto</label>
+          <input type="text" id="tr-name" placeholder="Tu nombre completo" />
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="tel" id="tr-phone" placeholder="+34 600 000 000" />
+        </div>
+        <div class="form-group">
+          <label>Punto de recogida</label>
+          <input type="text" id="tr-pickup" placeholder="Dirección de origen" />
+        </div>
+        <div class="form-group">
+          <label>Destino</label>
+          <input type="text" id="tr-dest" placeholder="Dirección de destino" />
+        </div>
+        <div class="form-group">
+          <label>Tipo de carga</label>
+          <select id="tr-cargo">
+            <option value="person">Persona</option>
+            <option value="package">Paquete</option>
+            <option value="food">Comida</option>
+            <option value="medical">Material médico</option>
+            <option value="fragile">Objeto frágil</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notas adicionales</label>
+          <input type="text" id="tr-notes" placeholder="Instrucciones especiales…" />
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="requestTransport()">🚀 Solicitar Transporte</button>
+      <button class="btn btn-info" onclick="getRoutes()">🗺️ Ver Rutas Disponibles</button>
+      <div class="result-box" id="tr-result"><pre id="tr-result-text"></pre></div>
+    </div>
+
+    <!-- Rastrear Envío -->
+    <div class="section">
+      <h2>📍 Rastrear Envío en Tiempo Real</h2>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>ID de solicitud de transporte</label>
+          <input type="text" id="track-id" placeholder="Pega aquí el ID de tu solicitud" />
+        </div>
+      </div>
+      <button class="btn btn-info" onclick="trackTransport()">📍 Rastrear</button>
+      <div class="result-box" id="track-result"><pre id="track-result-text"></pre></div>
+    </div>
+  </div>
+
+  <script>
+    const API = '';
+    let lastRequestId = null;
+
+    async function checkStatus() {
+      try {
+        const r = await fetch(API + '/health');
+        const d = await r.json();
+        document.getElementById('statusBar').innerHTML =
+          `⬤ &nbsp;Robot Transporte: <strong>${d.status}</strong> · ${new Date(d.timestamp).toLocaleString('es')}`;
+        document.getElementById('statusBar').style.color = '#3fb950';
+      } catch {
+        document.getElementById('statusBar').textContent = '⬤  Robot Transporte: desconectado';
+        document.getElementById('statusBar').style.color = '#f85149';
+      }
+    }
+
+    async function requestTransport() {
+      const body = {
+        contact_name: document.getElementById('tr-name').value,
+        contact_phone: document.getElementById('tr-phone').value,
+        pickup_location: document.getElementById('tr-pickup').value,
+        destination: document.getElementById('tr-dest').value,
+        cargo_type: document.getElementById('tr-cargo').value,
+        notes: document.getElementById('tr-notes').value,
+      };
+      try {
+        const r = await fetch(API + '/api/transport/request', {
+          method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)
+        });
+        const d = await r.json();
+        if (d.request?.id) {
+          lastRequestId = d.request.id;
+          document.getElementById('track-id').value = lastRequestId;
+        }
+        showResult('tr', d);
+      } catch (e) { showResult('tr', {error: e.message}); }
+    }
+
+    async function getRoutes() {
+      try {
+        const r = await fetch(API + '/api/transport/routes');
+        showResult('tr', await r.json());
+      } catch (e) { showResult('tr', {error: e.message}); }
+    }
+
+    async function trackTransport() {
+      const id = document.getElementById('track-id').value.trim();
+      if (!id) return alert('Introduce un ID de solicitud');
+      try {
+        const r = await fetch(API + `/api/transport/track/${id}`);
+        showResult('track', await r.json());
+      } catch (e) { showResult('track', {error: e.message}); }
+    }
+
+    function showResult(prefix, data) {
+      const box = document.getElementById(prefix + '-result');
+      document.getElementById(prefix + '-result-text').textContent = JSON.stringify(data, null, 2);
+      box.style.display = 'block';
+    }
+
+    checkStatus();
+    setInterval(checkStatus, 30000);
+  </script>
+</body>
+</html>
