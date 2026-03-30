@@ -20,7 +20,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from .pqc_wrapper import PQCAlgorithm
+from pqc_wrapper import PQCAlgorithm
 
 
 @dataclass

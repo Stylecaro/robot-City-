@@ -8,9 +8,9 @@ given task.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
-from .base_robot import RobotStatus, RobotType, ServiceRobot, Task
+from base_robot import RobotStatus, RobotType, ServiceRobot, Task
 
 
 class ServiceRobotRegistry:
@@ -115,21 +115,39 @@ class ServiceRobotRegistry:
     # ------------------------------------------------------------------
 
     def dispatch_robot(
-        self, robot_type: RobotType, task: Task
-    ) -> Optional[ServiceRobot]:
+        self,
+        robot_type: "Union[RobotType, str]",
+        task: "Union[Task, str]",
+    ) -> "Optional[Dict[str, Any]]":
         """
         Assign *task* to the best available robot of *robot_type*.
+
+        Both *robot_type* and *task* may be passed as strings for
+        convenience (e.g. ``dispatch_robot("medical", "emergency")``).
 
         Selection strategy:
 
         1. Prefer IDLE robots over ACTIVE ones.
         2. Among equal-status robots, prefer higher battery level.
 
-        Returns the selected robot, or ``None`` if none are available.
+        Returns a dict ``{"success": True, "robot_id": ..., "robot": ...}``
+        or ``{"success": False, "reason": ...}`` when no robot is available.
         """
+        # Coerce string → RobotType
+        if isinstance(robot_type, str):
+            try:
+                robot_type = RobotType(robot_type.lower())
+            except ValueError:
+                return {"success": False, "reason": f"Unknown robot_type '{robot_type}'"}
+
+        # Coerce string → Task
+        if isinstance(task, str):
+            from base_robot import Task as _Task
+            task = _Task(description=task)
+
         candidates = self.get_available_robots(robot_type)
         if not candidates:
-            return None
+            return {"success": False, "reason": f"No available {robot_type.value} robot"}
 
         # Sort: IDLE before ACTIVE, then descending battery level.
         def _key(r: ServiceRobot) -> tuple:
@@ -138,4 +156,4 @@ class ServiceRobotRegistry:
 
         best = min(candidates, key=_key)
         best.assign_task(task)
-        return best
+        return {"success": True, "robot_id": best.robot_id, "robot": best.to_dict()}
